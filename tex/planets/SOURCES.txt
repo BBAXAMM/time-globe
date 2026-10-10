@@ -1,0 +1,32 @@
+Planet / dwarf-planet texture provenance
+=======================================
+All maps below are Solar System Scope textures (https://www.solarsystemscope.com/textures/),
+licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Attribution: "Solar System Scope".
+The Ceres/Eris/Haumea/Makemake maps are Solar System Scope's "fictional" (artistic, not scientific) maps.
+No planetpixelemporium textures are used.
+Each file was resized to 1024x512 (Lanczos) and saved as JPEG quality 84 (2026-09-24).
+
+mars.jpg          <- github.com/hugogu/orbit @84b32ba0ae6153db9ee0625738edd7f41261b355
+                     public/textures/2k_mars.jpg (SSS 2k_mars.jpg)
+venus.jpg         <- github.com/hugogu/orbit @84b32ba0ae6153db9ee0625738edd7f41261b355
+                     public/textures/2k_venus_atmosphere.jpg (SSS 2k_venus_atmosphere.jpg)
+moon.jpg          <- github.com/hugogu/orbit @84b32ba0ae6153db9ee0625738edd7f41261b355
+                     public/textures/2k_moon.jpg (SSS 2k_moon.jpg)
+earth_clouds.jpg  <- github.com/Siqister/files @75c20230c70ebb3b8a0919899d7fa1e5fe29e612
+                     2k_earth_clouds.jpg (SSS 2k_earth_clouds.jpg); converted to 8-bit grayscale,
+                     luminance = cloud density
+ceres.jpg         <- github.com/sanderblue/solar-system-threejs @2ed70f6955b88070080e21067568c233a50856ec
+                     src/assets/textures/ceres_fictional.jpg (1024x512 copy of SSS 2k_ceres_fictional.jpg,
+                     renamed in that repo; identification by name/appearance)
+eris.jpg          <- github.com/Addey34/galaxy-3d @e6f0f57968c7dee8e6057619e7a91760622c3256
+                     public/assets/textures/eris/eris_surface_2k.jpg (SSS eris_fictional, renamed in that repo;
+                     its THIRD_PARTY_NOTICES.md lists it as "CC BY 4.0, Solar System Scope, illustrative")
+haumea.jpg        <- github.com/Addey34/galaxy-3d @e6f0f57968c7dee8e6057619e7a91760622c3256
+                     public/assets/textures/haumea/haumea_surface_2k.jpg (SSS haumea_fictional, renamed; same notice)
+makemake.jpg      <- github.com/Addey34/galaxy-3d @e6f0f57968c7dee8e6057619e7a91760622c3256
+                     public/assets/textures/makemake/makemake_surface_2k.jpg (SSS makemake_fictional, renamed; same notice)
+
+Note: exact filenames 2k_ceres_fictional.jpg / 2k_eris_fictional.jpg / 2k_haumea_fictional.jpg /
+2k_makemake_fictional.jpg were not found in any public GitHub repo searched; the renamed copies above were used.
+Files already in this folder before this pass (jupiter, saturn, saturn_ring, uranus, neptune, sun, mercury)
+are not covered by this list (see app credits: Solar System Scope CC BY 4.0; Mercury NASA/JHUAPL MESSENGER).
