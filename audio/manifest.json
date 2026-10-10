@@ -1,0 +1,56 @@
+{
+ "battle_melee": [
+  "battle_melee"
+ ],
+ "bgm_ancient": [
+  "bgm_ancient"
+ ],
+ "bgm_medieval": [
+  "bgm_medieval"
+ ],
+ "bgm_modern": [
+  "bgm_modern"
+ ],
+ "bgm_prehistoric": [
+  "bgm_prehistoric"
+ ],
+ "cannon": [
+  "cannon"
+ ],
+ "cat": [
+  "cat"
+ ],
+ "cow": [
+  "cow"
+ ],
+ "dog": [
+  "dog"
+ ],
+ "gallop": [
+  "gallop"
+ ],
+ "musket": [
+  "musket"
+ ],
+ "neigh": [
+  "neigh"
+ ],
+ "pig": [
+  "pig"
+ ],
+ "rooster": [
+  "rooster"
+ ],
+ "sheep": [
+  "sheep"
+ ],
+ "swords": [
+  "swords"
+ ],
+ "war_cry": [
+  "war_cry"
+ ],
+ "wheat_wind": [
+  "wheat_wind"
+ ]
+}
