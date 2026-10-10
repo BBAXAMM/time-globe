@@ -1733,7 +1733,7 @@ function osmDecode(j,D){ var o=j.o, q=j.q;
   return D; }
 /* 한반도: OpenStreetMap 자세한 자료(나라 모양대로 잘라) + 세계: Natural Earth 큰길·호수 — 둘을 한데 합쳐 써(네모 칸 경계 없음) */
 function osmLoad(){ if(OSM.d||OSM.loading) return; OSM.loading=true;
-  Promise.all(['data/korea_osm.json','data/world_water.json'].map(function(u){ return fetch(u).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); })).then(function(js){ var D={};
+  Promise.all(['data/korea_osm.json','data/korea_osm2.json','data/world_water.json'].map(function(u){ return fetch(u).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); })).then(function(js){ var D={};
     js.forEach(function(j){ if(j) osmDecode(j,D); }); OSM.d=D; OSM.bbox=[-180,-90,180,90]; osmGlobe(); dirty=true; dirtyOv=true; }); }
 function osmNear(lat,lon,pad){ var b=OSM.bbox; pad=pad||0; lon=((lon%360)+540)%360-180; /* 끌어 돌리면 경도가 360을 넘어 쌓여서 정규화 */ return lon>b[0]-pad&&lon<b[2]+pad&&lat>b[1]-pad&&lat<b[3]+pad; }
 /* 지구 반대편 선·면이 비쳐 보이지 않게: 그 점이 카메라에서 지구에 가려지면(지평선 너머) 그리지 않아 — 점 p가 보이려면 (카메라−p)·p > 0 */
@@ -8566,4 +8566,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=f235b176e2"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=adb2a69a92"); });</script></body></html>
