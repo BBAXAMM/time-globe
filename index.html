@@ -3,16 +3,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
 :root{
-  --panel:rgba(239,233,222,.93); --panel-solid:#efe9de; --ink:#2b2722; --ink-2:#6b6358; --hair:rgba(43,39,34,.14);
-  --accent:#1f6f8b; --accent-ink:#fff; --hi:#e0a100; --chip:rgba(29,42,46,.06);
+  --panel:rgba(248,246,241,.93); --panel-solid:#f8f6f1; --ink:#2a2622; --ink-2:#6e675e; --hair:rgba(42,38,34,.12);
+  --accent:#1f6f8b; --accent-ink:#fff; --hi:#e0a100; --chip:rgba(60,50,40,.05);
   --space:#04070a; color-scheme:light;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --panel:rgba(30,31,33,.9); --panel-solid:#1e1f21; --ink:#e7e5e1; --ink-2:#a19e98; --hair:rgba(231,229,225,.14);
-  --accent:#5fb3cf; --accent-ink:#0c1215; --hi:#ffc93c; --chip:rgba(227,232,228,.07); color-scheme:dark; }}
+  --panel:rgba(32,31,29,.9); --panel-solid:#201f1d; --ink:#ebe8e3; --ink-2:#a6a19a; --hair:rgba(235,232,227,.13);
+  --accent:#5fb3cf; --accent-ink:#0c1215; --hi:#ffc93c; --chip:rgba(235,230,222,.07); color-scheme:dark; }}
 :root[data-theme="dark"]{
-  --panel:rgba(30,31,33,.9); --panel-solid:#1e1f21; --ink:#e7e5e1; --ink-2:#a19e98; --hair:rgba(231,229,225,.14);
-  --accent:#5fb3cf; --accent-ink:#0c1215; --hi:#ffc93c; --chip:rgba(227,232,228,.07); color-scheme:dark;
+  --panel:rgba(32,31,29,.9); --panel-solid:#201f1d; --ink:#ebe8e3; --ink-2:#a6a19a; --hair:rgba(235,232,227,.13);
+  --accent:#5fb3cf; --accent-ink:#0c1215; --hi:#ffc93c; --chip:rgba(235,230,222,.07); color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -381,7 +381,7 @@ body.ui-off #gHud{transform:translate(-50%,-140%);opacity:0;pointer-events:none}
 <div id="searchWrap">
   <div id="searchBox">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input id="q" type="search" autocomplete="off" placeholder="나라·민족·지명·사건·별자리 (예: 고구려, 에베소, 몽골, 오리온)" aria-label="검색">
+    <span class="sLbl" aria-hidden="true">검색</span><input id="q" type="search" autocomplete="off" placeholder="나라·민족·지명·사건·별자리 (예: 고구려, 에베소, 몽골, 오리온)" aria-label="검색">
   </div>
   <div id="results" hidden></div>
 </div>
@@ -416,7 +416,7 @@ body.ui-off #gHud{transform:translate(-50%,-140%);opacity:0;pointer-events:none}
   <div class="cosBar"><button class="step" id="cosExit" title="닫기">✕</button><button class="step" id="cosPrev" title="이전 단계">◂</button><button class="step" id="cosPlay" title="재생">▶</button><button class="step" id="cosNext" title="다음 단계">▸</button><button class="step" id="cosSpd" title="재생 속도">×1</button><span id="cosTime"></span><button class="cosLk go" id="cosGeo" title="46억 년 전 지구로 — 지질 시대 시작">🌍 지질 시대 <i>→</i></button></div>
   <div id="cosAbs"><span class="lbl">전체</span><div id="cosAbsIn" role="slider" aria-label="우주 전체 시간(절대 막대)"></div><button class="step" id="cosLin" aria-pressed="false" title="로그 눈금 ↔ 선형 눈금">로그</button></div>
   <div id="cosDetW"><span class="lbl">세부</span><canvas id="cosDet" role="slider" aria-label="세부 시간(주변 단계 확대)"></canvas></div>
-  <div class="cosCard"><div class="kicker">우주 시대 · 로그 시간</div><h2 id="cosName"></h2><div class="en" id="cosSub"></div><div id="cosDesc"></div><div class="cosNext"><button id="cosToEarth" class="cosLk go" hidden>🌍 지질 시대로 이어 보기 <i>→</i></button></div></div>
+  <div class="cosCard"><div class="kicker">우주 시대</div><h2 id="cosName"></h2><div class="en" id="cosSub"></div><div id="cosDesc"></div><div class="cosNext"><button id="cosToEarth" class="cosLk go" hidden>🌍 지질 시대로 이어 보기 <i>→</i></button></div></div>
 </div>
 <div id="gHud" hidden><div class="g1"><button class="step" id="gExit">◂ 지구본</button><span class="seg" role="group"><button id="gModeH">🔭 지평선</button><button id="gModeT">🛰 우주</button></span><button class="step" id="gSun">☀ 해</button><button class="step" id="gMoon">☾ 달</button><button class="step" id="gWide">넓게</button><button class="step" id="gMap" title="이 자리를 오늘의 지도 서비스에서 열기(새 창)">🗺 지도</button><button class="step" id="gCloud" aria-pressed="true" title="구름 켜고 끄기">☁ 구름</button><button class="step" id="gTrk" title="달 그림자 따라가기">🌑 그림자</button><span id="gDir"></span></div><div class="g2" id="gStat"></div></div>
 <div id="moonView" hidden role="dialog" aria-label="달 모양 보기">
@@ -7887,12 +7887,13 @@ function histEraCard(){ var y=S.year, b=histBand(y), d=HIST_ERA_D[b[2]]||['','']
     for(var i=0;i<Z.length;i++){ var z=Z[i]; if(lat>=z[0]&&lat<=z[2]&&lon>=z[1]&&lon<=z[3]){ if(i<2&&y!=null) { var k=korea(y,lon); return {off:k[0],name:k[1]==='지방 평균시'?'지방 평균시':(i===0?'한국 표준시':'한국·북한 표준시')}; }
         if(y<1900) return {off:lon/15,name:'지방 평균시'}; if(z[4]==null) return {off:Math.round(lon/15),name:z[5]+' 표준시(경도 어림)'}; return {off:z[4],name:z[5]+' 표준시'}; } }
     return {off:y<1900?lon/15:Math.round(lon/15),name:y<1900?'지방 평균시':'경도로 어림한 시간대'}; };
+  function tzEn(n){ var M={'지방 평균시':'Local mean time','한국 표준시':'Korea Standard Time','한국·북한 표준시':'Korea Standard Time','그리니치 평균시':'Greenwich Mean Time','경도로 어림한 시간대':'Zone estimated from longitude','동유럽·남아프리카 시간':'Eastern European / South African Time','태평양 표준시':'Pacific Standard Time','산악 표준시':'Mountain Standard Time','중부 표준시':'Central Standard Time','동부 표준시':'Eastern Standard Time','대서양 표준시':'Atlantic Standard Time','알래스카 표준시':'Alaska Standard Time','하와이 표준시':'Hawaii Standard Time'}; if(M[n]) return M[n]; var m=n.match(/^(.*) 표준시(\(경도 어림\))?$/); if(m){ var b=(typeof T==='function'?T(m[1]):m[1]); return (b===m[1]&&/[가-힣]/.test(b)?'Local':b)+' standard time'+(m[2]?' (estimated)':''); } var t=typeof T==='function'?T(n):n; return /[가-힣]/.test(t)?'Local time':t; }
   function fmtOff(o){ var s=o<0?'−':'+', a=Math.abs(o), h=Math.floor(a), m=Math.round((a-h)*60); return 'UTC'+s+h+(m?':'+('0'+m).slice(-2):''); }
   var uc=updateClock; updateClock=function(){ var r=uc.apply(this,arguments);
     var yy=S.year+(S.doy-1)/365, P=GROUND.on&&GROUND.obs?GROUND.obs:(typeof HOME!=='undefined'&&HOME?HOME:{lat:37.57,lon:126.98}), z=ASTRO.on&&S.mode==='hist'?tzAt(P.lat,P.lon,yy):null;   /* 지평선 보기면 그 자리, 아니면 '내 위치'(없으면 서울) 시간대 */ var o0=TZ.off; TZ.on=!!z; TZ.off=z?z.off:0; TZ.name=z?z.name:''; if(o0!==TZ.off&&typeof drawDial2==='function') drawDial2();
     if(z){ var en=LANG==='en', t=(S.doy-1)*24+S.hour+z.off, YL=yearLen(), d=Math.floor(t/24), h=t-d*24, doy=((d%YL)+YL)%YL+1, md=doyToMD(doy), hh=Math.floor(h), mm=Math.floor((h-hh)*60);
       var uh=Math.floor(S.hour), um=Math.floor((S.hour-uh)*60), ys=fmtYear(S.year)+' ';
-      $('#clkDate').innerHTML=esc(ys+(en?(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][md[0]-1]+' '+md[1]):(md[0]+'월 '+md[1]+'일'))+' · '+('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+' '+(en?'local':'현지'))+'<span class="clkZ">'+esc(z.name+', '+fmtOff(z.off)+' · UTC '+('0'+uh).slice(-2)+':'+('0'+um).slice(-2))+'</span>';   /* 긴 괄호 설명은 한 줄 내려 창 폭을 줄여 */ }
+      $('#clkDate').innerHTML=esc(ys+(en?(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][md[0]-1]+' '+md[1]):(md[0]+'월 '+md[1]+'일'))+' · '+('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+' '+(en?'local':'현지'))+'<span class="clkZ">'+esc((en?tzEn(z.name):z.name)+', '+fmtOff(z.off)+' · UTC '+('0'+uh).slice(-2)+':'+('0'+um).slice(-2))+'</span>';   /* 긴 괄호 설명은 한 줄 내려 창 폭을 줄여 */ }
     return r; };
   var ge=groundEnter; groundEnter=function(){ var r=ge.apply(this,arguments); setTimeout(updateClock,1500); return r; };
   var gx=groundExit; groundExit=function(){ var r=gx.apply(this,arguments); TZ.on=false; TZ.off=0; updateClock(); return r; };
@@ -7909,9 +7910,9 @@ function histEraCard(){ var y=S.year, b=histBand(y), d=HIST_ERA_D[b[2]]||['','']
   paint(); })();
 /* ================= 단추 모양 통일: 테두리 대신 면 채우기(애플 지도·구글 어스식 '채운 알약' 단추) · 지평선 창 여백·정렬 ================= */
 (function(){ var st=document.createElement('style'); st.textContent=[
-  ':root{--fillB:rgba(29,42,46,.075);--fillH:rgba(29,42,46,.13)}',
-  '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fillB:rgba(227,232,228,.12);--fillH:rgba(227,232,228,.2)}}',
-  ':root[data-theme="dark"]{--fillB:rgba(227,232,228,.12);--fillH:rgba(227,232,228,.2)}',
+  ':root{--fillB:rgba(60,50,40,.07);--fillH:rgba(60,50,40,.12)}',
+  '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fillB:rgba(235,230,222,.11);--fillH:rgba(235,230,222,.19)}}',
+  ':root[data-theme="dark"]{--fillB:rgba(235,230,222,.11);--fillH:rgba(235,230,222,.19)}',
   '.step{border-color:transparent!important;background:var(--fillB)}',
   '.step:hover{background:var(--fillH)}',
   '.step[aria-pressed="true"]{background:var(--accent)!important;color:var(--accent-ink)!important}',
@@ -8379,7 +8380,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   if(typeof barTone==='function'){ var bt=barTone; barTone=function(hex){ if(!isLight()) return bt(hex);
       var n=parseInt(String(hex).replace('#',''),16), r=(n>>16&255)/255, g=(n>>8&255)/255, b=(n&255)/255, mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn, h=0;
       if(d>0){ h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4; h*=60; if(h<0) h+=360; }
-      return {bg:'hsl('+Math.round(h)+' 46% 82%)',ink:'#2b2722'}; }; }
+      return {bg:'hsl('+Math.round(h)+' 42% 75%)',ink:'#2a2622'}; }; }
   function rebuild(){ try{ buildBar(); }catch(e){} try{ timeChanged(); }catch(e){} }
   new MutationObserver(rebuild).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   try{ matchMedia('(prefers-color-scheme: light)').addEventListener('change',rebuild); }catch(e){}
@@ -8387,7 +8388,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   var st=document.createElement('style');
   st.textContent=[
     '#evChips[hidden]{display:none!important}','#top{grid-template-columns:minmax(0,1fr)!important}#top>*{min-width:0}',
-    '#ctl .iconbtn,#searchBox,#results,#card,#card .cardHead,.sheet,#clockBox,#hud{'+GL+'}',
+    '#ctl .iconbtn,#searchBox,#results,#card,.sheet,#clock,#calPop,#notes,#bmkPop,#hud{'+GL+'}',
     '.cbar .u.on{outline:none!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 70%,transparent),inset 0 0 9px 1px color-mix(in srgb,var(--ink) 38%,transparent)!important}'
   ].join('');
   document.head.appendChild(st);
@@ -8438,7 +8439,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   linOpen=function(sel,dom){
     if(sel&&!dom){ var k0=setOf(sel); if(k0) dom=k0; }
     if(dom&&dom!==LIN_CUR){ LIN_CUR=dom; } if(!LIN_SETS[LIN_CUR]) LIN_CUR='philo';
-    var SET=LIN_SETS[LIN_CUR], LIN=SET.n, LIN_E=SET.e, LIN_T=SET.lanes, en=LANG==='en';
+    var SET=LIN_SETS[LIN_CUR], LIN=SET.n, LIN_E=SET.e, LIN_T=SET.lanes, en=LANG==='en'; if(en){ var EN=SET.en||{}, LE=SET.laneEn||{}; LIN=LIN.map(function(n){ var c=n.slice(); if(EN[n[0]]) c[1]=EN[n[0]]; return c; }); LIN_T=LIN_T.map(function(t){ return [t[0],LE[t[0]]||t[1],t[2]]; }); }
     var d=$('#linBox'); if(!d){ d=document.createElement('div'); d.id='linBox'; d.setAttribute('role','dialog'); document.body.appendChild(d); }
     var y0=Math.min.apply(null,LIN.map(function(n){ return n[2]; }))-80, lane={}, byId={}; LIN_T.forEach(function(t,i){ lane[t[0]]=i; }); LIN.forEach(function(n){ byId[n[0]]=n; });
     var col=ST.col[LIN_CUR]||(ST.col[LIN_CUR]={});
@@ -8514,9 +8515,9 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   function sync(){ if(typeof IDX==='undefined'||!IDX||typeof LIN_SETS==='undefined') return; var n=0; Object.keys(LIN_SETS).forEach(function(k){ n+=LIN_SETS[k].n.length; }); if(n===sig) return; sig=n;
     for(var i=IDX.length-1;i>=0;i--) if(IDX[i].t==='lin') IDX.splice(i,1);
     var evEn={}; try{ EVENTS.forEach(function(e){ evEn[e.id]=e.en||''; }); }catch(e){}
-    Object.keys(LIN_SETS).forEach(function(k){ var S0=LIN_SETS[k]; S0.n.forEach(function(nd){ var nm=nd[1].replace(/[『』「」]/g,''); IDX.push({t:'lin',set:k,id:nd[0],nd:nd,key:norm(nm)+' '+nm.split(/[\s·()]+/).map(norm).join(' ')+' '+norm(evEn[nd[4]]||'')+' '+norm(nd[0]),w:(nd[7]||'p')==='p'?2.4:1.8}); }); }); }
+    Object.keys(LIN_SETS).forEach(function(k){ var S0=LIN_SETS[k]; S0.n.forEach(function(nd){ var nm=nd[1].replace(/[『』「」]/g,''); IDX.push({t:'lin',set:k,id:nd[0],nd:nd,key:norm(nm)+' '+norm((S0.en||{})[nd[0]]||'')+' '+nm.split(/[\s·()]+/).map(norm).join(' ')+' '+norm(evEn[nd[4]]||'')+' '+norm(nd[0]),w:(nd[7]||'p')==='p'?2.4:1.8}); }); }); }
   var ds=doSearch; doSearch=function(q){ try{ sync(); }catch(e){} return ds.apply(this,arguments); };
-  var xr=extraResItem; extraResItem=function(it){ if(it.t!=='lin') return xr.apply(this,arguments); var nd=it.nd, K={p:'인물',s:'학파·사조',w:'저작·사건'}; return [nd[1],LIN_SETS[it.set].t+' · '+(K[nd[7]||'p']),nd[2]<-9999?Math.round(-nd[2]/10000)+'만 년 전':fmtYearShort(nd[2])]; };
+  var xr=extraResItem; extraResItem=function(it){ if(it.t!=='lin') return xr.apply(this,arguments); var nd=it.nd, K={p:'인물',s:'학파·사조',w:'저작·사건'}; var ENm=(LIN_SETS[it.set].en||{})[nd[0]]; return [LANG==='en'&&ENm?ENm:nd[1],(LANG==='en'?(ENm&&ENm!==nd[1]?nd[1]+' · ':''):(ENm?ENm+' · ':''))+LIN_SETS[it.set].t+' · '+(K[nd[7]||'p']),nd[2]<-9999?Math.round(-nd[2]/10000)+'만 년 전':fmtYearShort(nd[2])]; };
   var xc=extraChoose; extraChoose=function(it){ if(it.t!=='lin') return xc.apply(this,arguments); linOpen(it.id,it.set); };
 })();
 
@@ -8581,6 +8582,307 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   var mvd=moonViewDraw; moonViewDraw=function(){ var r=mvd.apply(this,arguments); try{ draw(); btns(); }catch(e){} return r; };
   var mp=moonPlay; moonPlay=function(){ var r=mp.apply(this,arguments); try{ btns(); }catch(e){} return r; };
   if(window.ResizeObserver) new ResizeObserver(function(){ draw(); dL.render(); dP.render(); }).observe(cv);
+})();
+
+/* v76 — 검색창 접힘, 설명 카드(제목 고정·본문만 스크롤·위아래 안쪽 그라데이션), 켜짐 토글 통일, 내 위치 칸 투명, 지질 단위 테두리 회색 통일 */
+(function(){
+  var en=LANG==='en';
+  try{ EV_COL.daily='#cbc157'; EV_CAT.daily='일상'; I18N['일상']='Daily life'; I18N['문학']='Literature'; I18N['검색']='Search'; PIN_EMO.daily='🍚'; var vi=EV_ORDER.indexOf('voyage'); if(EV_ORDER.indexOf('daily')<0) EV_ORDER.splice(vi+1,0,'daily'); if(typeof evChipsRender==='function') evChipsRender(); }catch(e){}
+  var st=document.createElement('style'); st.id='v76ui';
+  st.textContent=[
+    /* 검색창: 비었고 초점 없을 땐 돋보기+'검색'만 */
+    '#searchWrap{transition:width .22s cubic-bezier(.2,.8,.2,1)}',
+    '#searchBox .sLbl{font-size:14px;color:var(--ink-2);padding:9px 6px 9px 0;white-space:nowrap;cursor:text}',
+    '#searchWrap:not(.col) .sLbl{display:none}',
+    '#searchWrap.col{width:auto!important}#searchWrap.col #searchBox{cursor:pointer}',
+    '#searchWrap.col #q{flex:0 0 0;width:0;padding-left:0;padding-right:0;opacity:0}',
+    /* 설명 카드: 바깥은 자르고, 제목 칸은 고정·투명, 본문만 스크롤 */
+    '#card{overflow:hidden!important;display:flex;flex-direction:column;padding:13px 16px 0!important}',
+    '#card .cardHead{position:relative!important;top:auto!important;flex:none;margin:-13px -16px 0!important;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}',
+    '#card .cardBody{flex:1 1 auto;min-height:0;overflow:auto;margin:0 -16px;padding:8px 16px 20px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 24%,transparent) transparent;',
+    ' -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 20px),transparent 100%)}',
+    '#card .cardBody::-webkit-scrollbar{width:6px}#card .cardBody::-webkit-scrollbar-track{background:transparent;margin:10px 0 18px}',
+    '#card .cardBody::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 24%,transparent);border:0!important;border-radius:6px}',
+    '#card.min .cardBody{display:none!important}',
+    /* 켜진 토글(.seg): 시대 토글도 달 창 토글처럼 — 바탕보다 한 단 밝은 면 */
+    ':root{--segOn:#fffdf9}',
+    '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--segOn:#3a3835}}:root[data-theme="dark"]{--segOn:#3a3835}',
+    '#top .seg[role=group]>.pill{background:var(--segOn)!important;box-shadow:0 1px 2px rgba(0,0,0,.08)!important}',
+    '.seg button[aria-pressed="true"]{background:var(--segOn)!important;color:var(--ink)!important;font-weight:600}',
+    '#moonView .seg button[aria-pressed="true"],#cosx .seg button[aria-pressed="true"]{background:rgba(255,255,255,.2)!important;color:#fff!important}',
+    /* 내 위치 칸: 그림자 없이 투명 */
+    '#locInfo{box-shadow:none!important;background:transparent!important}',
+    '#clock .clk4{background:transparent!important}',
+    /* 지질 단위 현재 칸: 두 테마 같은 회색(두 바탕의 중간 명도) */
+    '.cbar .u.on{box-shadow:inset 0 0 0 1px #8b8781,inset 0 0 9px 1px rgba(139,135,129,.55)!important;outline:none!important}'
+  ].join('\n');
+  document.head.appendChild(st);
+
+  /* 검색창 접기/펴기 */
+  var wrap=$('#searchWrap'), q=$('#q'), lbl=document.querySelector('#searchBox .sLbl');
+  if(wrap&&q){ if(lbl) lbl.textContent=en?'Search':'검색';
+    var mc=document.createElement('canvas').getContext('2d');
+    function fullW(){ mc.font='15px "IBM Plex Sans KR",system-ui,sans-serif'; var w=mc.measureText(q.placeholder||'').width+62; return Math.min(Math.max(320,w),innerWidth-88); }
+    function sync(){ var open=document.activeElement===q||q.value.trim()!==''; wrap.classList.toggle('col',!open); wrap.style.width=open?fullW()+'px':''; }
+    q.addEventListener('focus',sync); q.addEventListener('blur',function(){ setTimeout(sync,120); }); q.addEventListener('input',sync);
+    $('#searchBox').addEventListener('pointerdown',function(e){ if(e.target!==q){ e.preventDefault(); q.focus(); } });
+    addEventListener('resize',sync); sync(); }
+
+  /* 설명 카드 본문 감싸기 */
+  var c=$('#card');
+  if(c){ var busy=false;
+    function wrapBody(){ if(busy) return; busy=true; try{
+        if(!c.querySelector(':scope > .cardHead')&&c.querySelector(':scope > h2')&&typeof cardHead==='function') cardHead(true);
+        var head=c.querySelector(':scope > .cardHead'), body=c.querySelector(':scope > .cardBody');
+        var kids=[].slice.call(c.children).filter(function(k){ return k!==head&&k!==body&&!k.matches('.x,.minb,.pinb,.bmkb,.kicker,h2'); });
+        if(kids.length){ if(!body){ body=document.createElement('div'); body.className='cardBody'; c.appendChild(body); }
+          var pre=document.createDocumentFragment(), before=true; [].slice.call(c.children).forEach(function(k){ if(k===body){ before=false; return; } if(kids.indexOf(k)<0) return; if(before) pre.appendChild(k); else body.appendChild(k); });
+          body.insertBefore(pre,body.firstChild); }
+        if(body&&!body.childNodes.length) body.remove();
+      }finally{ busy=false; } }
+    new MutationObserver(wrapBody).observe(c,{childList:true}); wrapBody(); }
+})();
+
+/* v76 우주 시대 화면 정리
+   머리 줄: [시대 토글] [단계 제목] ……… [− 단계/세부 +] [◀ ×속도 ▶] [EN] [테마]   (아래 중복 조작 줄·지질 링크·로그 토글 버튼 없앰)
+   막대: 선형 · 로그 · 세부 세 줄을 늘 함께(세부 줄은 높게) — 버튼이 '지금 상태'를 보여 주던 문제 해결 */
+(function(){
+  if(typeof COSMO==='undefined'||!$('#cosmo')) return;
+  var en=function(){ return LANG==='en'; };
+  function isLight(){ var t=document.documentElement.getAttribute('data-theme'); return t==='light'||(!t&&matchMedia('(prefers-color-scheme: light)').matches); }
+  var st=document.createElement('style'); st.id='v76cos';
+  st.textContent=[
+    'body.cosmo #tCtl,body.cosmo .dialrow{display:none!important}',
+    '#cosHdr,#cosCtl{display:none}',
+    'body.cosmo #cosHdr{display:block;font:700 19px "Gowun Batang",Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}',
+    'body.cosmo #cosCtl{display:flex;gap:8px;margin-left:auto;flex:none}',
+    'body.cosmo #timeBig{display:none!important}',
+    '#cosCtl .cbx{display:flex;align-items:stretch;height:32px;border-radius:10px;background:var(--fillB);overflow:hidden}',
+    '#cosCtl .cs{flex:none;width:24px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer;padding:0}',
+    '#cosCtl .cs.sm{font-size:9.5px}',
+    '#cosCtl .cs:first-child:hover{background:linear-gradient(90deg,var(--fillH),transparent)}#cosCtl .cs:last-child:hover{background:linear-gradient(270deg,var(--fillH),transparent)}',
+    '#cosCtl .cs[aria-pressed="true"]:first-child{background:linear-gradient(90deg,color-mix(in srgb,var(--selC) 45%,transparent),transparent)}#cosCtl .cs[aria-pressed="true"]:last-child{background:linear-gradient(270deg,color-mix(in srgb,var(--selC) 45%,transparent),transparent)}',
+    '#cosCtl .cl{border:0;background:transparent;color:var(--accent);font:inherit;font-weight:700;font-size:12.5px;padding:0 4px;cursor:ns-resize;white-space:nowrap;text-align:center}',
+    /* 막대 세 줄을 한 유리 창에 */
+    '#cosmo .cosBar{display:none!important}',
+    '#cosRows{position:absolute;left:12px;right:12px;top:10px;display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:14px;background:color-mix(in srgb,var(--panel-solid) 80%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.15);backdrop-filter:blur(14px) saturate(1.15);box-shadow:var(--shadow-win)}',
+    '#cosRows>#cosAbs,#cosRows>#cosDetW,#cosRows>#cosLinR{position:static!important;display:flex;gap:8px;align-items:center;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}',
+    '#cosRows .lbl{font-size:11.5px!important;opacity:.75;width:30px!important;flex:none}',
+    '#cosLinIn{position:relative;flex:1;height:26px;border-radius:7px;overflow:hidden;touch-action:none;cursor:pointer;user-select:none;background:#222}',
+    '#cosLinIn .band{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding-left:4px;font-size:10.5px;color:#fff;white-space:nowrap;overflow:hidden;border-right:1px solid rgba(0,0,0,.3);pointer-events:none}',
+    '#cosLinIn .stk{position:absolute;top:0;width:1px;height:8px;background:#ffd27a;pointer-events:none}#cosLinIn .now{position:absolute;top:0;bottom:0;width:2px;background:#7dffb0;pointer-events:none}',
+    '#cosLinIn em{position:absolute;bottom:1px;font-size:9px;font-style:normal;color:#fff;opacity:.75;transform:translateX(-50%);pointer-events:none}',
+    '#cosLinIn .cursor{position:absolute;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:#fff;border-radius:2px;box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}',
+    '#cosLin{display:none!important}',
+    '@media (max-width:640px){body.cosmo #top .row1{flex-wrap:wrap;row-gap:6px}body.cosmo #langBtn{margin-left:auto}body.cosmo #cosHdr{order:5;flex:1 1 40%;font-size:16px}body.cosmo #cosCtl{order:6;margin-left:auto}body.cosmo #langBtn,body.cosmo #themeBtn{order:2}}',
+    '#cosDet{height:86px!important}',
+    '#cosmo .cosCard{max-height:calc(100% - 210px)!important}',
+    /* 라이트 테마: 막대 바탕·커서 */
+    ':root[data-theme="light"] #cosAbsIn,:root[data-theme="light"] #cosLinIn{background:var(--fillB)}',
+    ':root[data-theme="light"] #cosAbsIn .cursor,:root[data-theme="light"] #cosLinIn .cursor{background:var(--ink);box-shadow:0 0 0 2px rgba(255,255,255,.7)}',
+    ':root[data-theme="light"] #cosAbsIn em,:root[data-theme="light"] #cosLinIn em{color:var(--ink)}',
+    '@media (prefers-color-scheme:light){:root:not([data-theme]) #cosAbsIn,:root:not([data-theme]) #cosLinIn{background:var(--fillB)}:root:not([data-theme]) #cosAbsIn .cursor,:root:not([data-theme]) #cosLinIn .cursor{background:var(--ink)}}'
+  ].join('\n');
+  document.head.appendChild(st);
+
+  /* 머리 줄 요소 */
+  var row1=document.querySelector('#top .row1'), lang=$('#langBtn');
+  var hdr=document.createElement('div'); hdr.id='cosHdr'; row1.insertBefore(hdr,$('#timeBig'));
+  var ctl=document.createElement('div'); ctl.id='cosCtl';
+  ctl.innerHTML='<div class="cbx"><button class="cs" id="ccM">−</button><button class="cl" id="ccU"></button><button class="cs" id="ccP">+</button></div>'+
+    '<div class="cbx"><button class="cs sm" id="ccR">◀</button><button class="cl" id="ccS"></button><button class="cs sm" id="ccF">▶</button></div>';
+  row1.insertBefore(ctl,lang);
+  var tt=$('#cosTime'); function syncHdr(){ hdr.textContent=tt?tt.textContent:''; hdr.title=hdr.textContent; }
+  if(tt) new MutationObserver(syncHdr).observe(tt,{childList:true,characterData:true,subtree:true});
+
+  var UNITS=[['stage','단계','Stage'],['sub','세부 사건','Event']], uI=0, SPD=[0.5,1,2,4];
+  function label(){ $('#ccU').textContent=en()?UNITS[uI][2]:UNITS[uI][1]; $('#ccS').textContent='×'+(COSMO.speed||1); $('#ccU').title=en()?'Step unit — click or wheel':'건너뛰기 단위 — 누르거나 휠'; $('#ccS').title=en()?'Playback speed':'재생 속도'; }
+  function cyc(el,f){ el.onclick=function(){ f(1); }; el.addEventListener('wheel',function(e){ e.preventDefault(); f(e.deltaY>0?1:-1); },{passive:false}); }
+  cyc($('#ccU'),function(d){ uI=(uI+d+UNITS.length)%UNITS.length; label(); });
+  cyc($('#ccS'),function(d){ var k=SPD.indexOf(COSMO.speed); k=Math.max(0,Math.min(SPD.length-1,(k<0?1:k)+d)); COSMO.speed=SPD[k]; label(); });
+  function step(dir){ stopRev(); if(COSMO.play) cosPlay(false);
+    if(UNITS[uI][0]==='stage'){ if(dir<0){ var i=COSMO.i; cosGo(COSMO.t>COS[i][0]+1e-6?i:i-1); } else cosGo(COSMO.i+1); return; }
+    var t=COSMO.t, best=null; COS_SUB.concat(COS.map(function(r){ return [r[0]]; })).forEach(function(s){ var d=s[0]-t; if(dir>0&&d>1e-9&&(best===null||s[0]<best)) best=s[0]; if(dir<0&&d<-1e-9&&(best===null||s[0]>best)) best=s[0]; });
+    if(best!==null) cosSet(best); }
+  $('#ccM').onclick=function(){ step(-1); }; $('#ccP').onclick=function(){ step(1); };
+  /* 거꾸로 재생 */
+  var rev=false, last=0;
+  function stopRev(){ rev=false; }
+  $('#ccF').onclick=function(){ stopRev(); cosPlay(!COSMO.play); };
+  $('#ccR').onclick=function(){ if(rev){ stopRev(); return; } if(COSMO.play) cosPlay(false); rev=true; COSMO.u=cosU(COSMO.t); last=performance.now(); };
+  (function loop(now){ requestAnimationFrame(loop); if(!COSMO.on) { rev=false; return; }
+    if(rev){ var dt=Math.min(0.1,(now-last)/1000); COSMO.u-=dt/5.2*(COSMO.speed||1); if(COSMO.u<=0){ COSMO.u=0; rev=false; } cosSet(cosTu(COSMO.u)); }
+    last=now;
+    var f=$('#ccF'), r=$('#ccR'); var pf=!!COSMO.play, pr=rev; if(f.__s!==pf){ f.__s=pf; f.textContent=pf?'❚❚':'▶'; f.setAttribute('aria-pressed',pf); } if(r.__s!==pr){ r.__s=pr; r.textContent=pr?'❚❚':'◀'; r.setAttribute('aria-pressed',pr); }
+    linCursor(); })(performance.now());
+
+  /* 막대 세 줄: 선형 · 로그 · 세부 */
+  var abs=$('#cosAbs'), det=$('#cosDetW'), rows=document.createElement('div'); rows.id='cosRows';
+  var linR=document.createElement('div'); linR.id='cosLinR'; linR.innerHTML='<span class="lbl"></span><div id="cosLinIn" role="slider" aria-label="우주 전체 시간(선형)"></div>';
+  abs.parentNode.insertBefore(rows,abs); rows.appendChild(linR); rows.appendChild(abs); rows.appendChild(det);
+  var linIn=$('#cosLinIn');
+  function lbls(){ linR.querySelector('.lbl').textContent=en()?'Linear':'선형'; abs.querySelector('.lbl').textContent=en()?'Log':'로그'; det.querySelector('.lbl').textContent=en()?'Detail':'세부'; }
+  function xLin(t){ var L=COSMO.lin; COSMO.lin=true; var x=cosX(t); COSMO.lin=L; return x; }
+  function linCursor(){ var c=linIn.querySelector('.cursor'); if(c){ var v=(xLin(COSMO.t)*100).toFixed(3)+'%'; if(c.style.left!==v) c.style.left=v; } }
+  function pastel(root){ if(!isLight()) return; root.querySelectorAll('.band').forEach(function(b){ var m=(b.getAttribute('style')||'').match(/background:\s*(#[0-9a-fA-F]{6})/); if(!m) return; var n=parseInt(m[1].slice(1),16), r=(n>>16&255)/255, g=(n>>8&255)/255, bl=(n&255)/255, mx=Math.max(r,g,bl), mn=Math.min(r,g,bl), d=mx-mn, h=0; if(d>0){ h=mx===r?((g-bl)/d)%6:mx===g?(bl-r)/d+2:(r-g)/d+4; h*=60; if(h<0) h+=360; } b.style.background=d<0.06?'hsl(30 8% 72%)':'hsl('+Math.round(h)+' 42% 75%)'; b.style.color='#2a2622'; b.style.borderRightColor='rgba(255,255,255,.5)'; }); }
+  var _build=cosAbsBuild;
+  cosAbsBuild=function(){ COSMO.lin=true; _build.apply(this,arguments); linIn.innerHTML=$('#cosAbsIn').innerHTML; COSMO.lin=false; _build.apply(this,arguments); pastel(linIn); pastel($('#cosAbsIn')); lbls(); label(); linCursor(); };
+  var drag=false; function linSet(e){ var r=linIn.getBoundingClientRect(), L=COSMO.lin; COSMO.lin=true; var t=cosXi((e.clientX-r.left)/r.width); COSMO.lin=L; cosSet(t); }
+  linIn.addEventListener('pointerdown',function(e){ linIn.setPointerCapture(e.pointerId); drag=true; COSMO.dragging=1; stopRev(); if(COSMO.play) cosPlay(false); linSet(e); });
+  linIn.addEventListener('pointermove',function(e){ if(drag) linSet(e); });
+  linIn.addEventListener('pointerup',function(e){ drag=false; COSMO.dragging=0; linSet(e); });
+  new MutationObserver(function(){ if(COSMO.on) cosAbsBuild(); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+  /* 세부 줄: 더 높게, 글자 크게, 테마 색 */
+  cosDetDraw=function(){ var cv=$('#cosDet'); if(!cv||!COSMO.on) return; var r=cv.getBoundingClientRect(), dpr=Math.min(2,devicePixelRatio||1), Wd=Math.max(50,r.width), Hd=r.height||86;
+    if(cv.width!==Math.round(Wd*dpr)||cv.height!==Math.round(Hd*dpr)){ cv.width=Math.round(Wd*dpr); cv.height=Math.round(Hd*dpr); }
+    var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,Wd,Hd); var w=COSMO.win||cosWin(), a=w[0], b=w[1], E=en(), Lt=isLight();
+    var INK=Lt?'rgba(42,38,34,.85)':'rgba(225,228,235,.85)', TICK=Lt?'rgba(42,38,34,.4)':'rgba(200,210,230,.5)', MAIN=Lt?'#b7791f':'#ffd27a', SUB=Lt?'#1f7fae':'#7fd6ff', CUR=Lt?'#2a2622':'#fff';
+    function X(t){ return 8+(Wd-16)*(t-a)/(b-a); }
+    var yB=Hd-34, hB=14;
+    COS_BAND.forEach(function(bd){ if(bd[1]<a||bd[0]>b) return; var x0=Math.max(8,X(bd[0])), x1=Math.min(Wd-8,X(bd[1])); g.fillStyle=bd[4]; g.globalAlpha=Lt?0.35:0.55; g.fillRect(x0,yB,x1-x0,hB); g.globalAlpha=1; });
+    g.font='10.5px system-ui,sans-serif'; g.textBaseline='top'; g.fillStyle=INK; g.strokeStyle=TICK;
+    var NT=Wd<520?3:5; for(var k=0;k<=NT;k++){ var t=a+(b-a)*k/NT, x=X(t); g.beginPath(); g.moveTo(x,yB+hB); g.lineTo(x,yB+hB+5); g.stroke(); g.textAlign=k===0?'left':k===NT?'right':'center'; g.fillText(cosFmt(t),x,yB+hB+7); }
+    var marks=[]; COS.forEach(function(r){ if(r[0]>=a-1e-9&&r[0]<=b+1e-9) marks.push([r[0],E?r[2]:r[1],1]); }); COS_SUB.forEach(function(s){ if(s[0]>=a&&s[0]<=b) marks.push([s[0],E?s[2]:s[1],0]); });
+    var lastR=[-99,-99]; g.textBaseline='bottom';
+    marks.sort(function(p,q){ return p[0]-q[0]; }).forEach(function(m){ var x=X(m[0]), top=m[2]?18:36; g.fillStyle=m[2]?MAIN:SUB; g.fillRect(x-(m[2]?1:0.5),top,m[2]?2:1,yB+hB-top);
+      g.font=(m[2]?'bold 11.5px ':'11px ')+'system-ui,sans-serif'; var row=m[2]?0:1, s=m[1].length>24?m[1].slice(0,23)+'…':m[1], tw=Math.min(g.measureText(s).width,170);
+      if(x-tw/2>lastR[row]+6||x<14){ g.textAlign='center'; var lx=clamp(x,tw/2+2,Wd-tw/2-2); g.fillStyle=m[2]?INK:(Lt?'rgba(31,127,174,.95)':'rgba(160,220,255,.95)'); g.fillText(s,lx,top-2); lastR[row]=lx+tw/2; } });
+    var cx=X(COSMO.t); g.fillStyle=CUR; g.fillRect(cx-1.5,16,3,yB+hB-14); g.beginPath(); g.moveTo(cx-5,13); g.lineTo(cx+5,13); g.lineTo(cx,19); g.fill(); };
+
+  lbls(); label(); syncHdr();
+  addEventListener('resize',function(){ if(COSMO.on) try{ cosDetDraw(); }catch(e){} });
+})();
+
+/* v76 역사 시대 — 지역별 세부 시대 구분
+   큰 시대 바 아래: ① 세부 시대 바(큰 바와 같은 눈금) ② 실제 시간 비율 미니 바(선형, -123,000 ~ 2025)
+   지역은 화면 한가운데(cam.lat/lon)로 고른다. 연대는 대략값이며 지역 안에서도 차이가 크다 — 각주에 밝힘.
+   항목: [시작, 끝, 한국어, English, 색 갈래(p 선사·a 고대·m 중세·e 근세·n 근대·c 현대), 일반 구분 이름] */
+var ERA_REG={
+ eu:{ko:'유럽·지중해',en:'Europe & Mediterranean',note:'에게해·지중해 기준이야. 북·서유럽은 신석기·청동기가 1~2천 년 늦고, 로마에 편입되기 전까지 철기(선사) 시대가 이어져.',noteEn:'Aegean/Mediterranean dates; northern and western Europe lag by 1–2 millennia and stay in a (prehistoric) Iron Age until Roman conquest.',s:[
+  [-123000,-40000,'중기 구석기','Middle Paleolithic','p'],[-40000,-10000,'후기 구석기','Upper Paleolithic','p'],[-10000,-7000,'중석기','Mesolithic','p'],[-7000,-4500,'신석기','Neolithic','p'],[-4500,-3200,'동기','Chalcolithic','p'],
+  [-3200,-1100,'청동기·상고대(미노스·미케네)','Bronze Age (Minoan–Mycenaean)','a','청동기 / 상고대'],[-1100,-800,'그리스 암흑시대','Greek Dark Ages','a'],[-800,-323,'고전 고대(그리스)','Classical Greece','a'],[-323,-31,'헬레니즘','Hellenistic','a'],[-31,476,'고전 고대(로마 제정)','Roman Empire','a'],
+  [476,1000,'전기 중세','Early Middle Ages','m'],[1000,1300,'성기 중세','High Middle Ages','m'],[1300,1492,'후기 중세','Late Middle Ages','m'],
+  [1492,1555,'초기 근세','Early modern I','e'],[1555,1648,'성기 근세(종교 전쟁)','Wars of Religion','e'],[1648,1789,'후기 근세(절대왕정·계몽)','Absolutism & Enlightenment','e'],
+  [1789,1848,'초기 근대(이중 혁명)','Dual Revolution','n'],[1848,1871,'성기 근대(국민국가)','Nation-states','n'],[1871,1914,'후기 근대(제국주의)','Age of Empire','n'],
+  [1914,1945,'초기 현대(세계 대전)','World Wars','c'],[1945,1991,'냉전','Cold War','c'],[1991,2025,'탈냉전·정보화','Post–Cold War','c']]},
+ ne:{ko:'서아시아·북아프리카',en:'West Asia & North Africa',note:'메소포타미아·이집트 기준이야. 중석기 대신 후구석기(나투프)라 부르고, 고전 고대 뒤로는 유럽식 \'중세\' 대신 칼리파·술탄 왕조로 나누는 게 보통이야.',noteEn:'Mesopotamia/Egypt. "Epipaleolithic" (Natufian) replaces Mesolithic; after antiquity, caliphates and sultanates are used instead of a European "Middle Ages".',s:[
+  [-123000,-50000,'중기 구석기','Middle Paleolithic','p'],[-50000,-20000,'후기 구석기','Upper Paleolithic','p'],[-20000,-10000,'후구석기(나투프)','Epipaleolithic (Natufian)','p','중석기'],[-10000,-5500,'신석기(농경 시작)','Neolithic','p'],[-5500,-3300,'동기','Chalcolithic','p'],
+  [-3300,-1200,'청동기·상고대(수메르·이집트)','Bronze Age (Sumer, Egypt)','a','청동기 / 상고대'],[-1200,-539,'철기(아시리아·신바빌로니아)','Iron Age (Assyria, Babylon)','a','철기'],[-539,-330,'페르시아 제국','Achaemenid Persia','a','고전 고대'],[-330,-30,'헬레니즘','Hellenistic','a'],[-30,632,'후기 고대(로마·사산)','Late Antiquity (Rome, Sasanians)','a','고전 고대'],
+  [632,1258,'칼리파 시대','Caliphates','m','전기·성기 중세'],[1258,1517,'몽골·맘루크','Mongols & Mamluks','m','후기 중세'],[1517,1798,'오스만·사파비','Ottomans & Safavids','e','근세'],[1798,1918,'개혁·식민 침투','Reform & colonial era','n','근대'],
+  [1918,1945,'위임통치·독립 투쟁','Mandates','c','초기 현대'],[1945,1991,'냉전·독립 국가','Cold War','c','냉전'],[1991,2025,'탈냉전','Post–Cold War','c']]},
+ cn:{ko:'중국',en:'China',note:'중국 고고학은 중석기를 거의 쓰지 않고, 동기 시대도 뚜렷하지 않아(치자 문화 등 일부). 역사 시대는 왕조로 나누고, 근대는 아편 전쟁(1840)부터 봐.',noteEn:'Chinese archaeology rarely uses "Mesolithic", and a Copper Age is marginal; history is divided by dynasties, with modern history from the Opium War (1840).',s:[
+  [-123000,-40000,'중기 구석기','Middle Paleolithic','p'],[-40000,-10000,'후기 구석기','Upper Paleolithic','p'],[-10000,-2000,'신석기(양사오·룽산)','Neolithic (Yangshao, Longshan)','p'],
+  [-2000,-771,'청동기(하·상·서주)','Bronze Age (Xia, Shang, Western Zhou)','a','청동기 / 상고대'],[-771,-221,'춘추전국(철기)','Spring & Autumn / Warring States','a','철기 / 고전 고대'],[-221,220,'진·한 제국','Qin–Han','a','고전 고대'],[220,589,'위진남북조','Six Dynasties','m','전기 중세'],[589,907,'수·당','Sui–Tang','m'],[907,1368,'송·원','Song–Yuan','m'],
+  [1368,1840,'명·청','Ming–Qing','e','근세'],[1840,1912,'청 말(근대)','Late Qing','n','근대'],[1912,1949,'중화민국','Republic of China','c','초기 현대'],[1949,1978,'중화인민공화국 초기','Early PRC','c','냉전'],[1978,2025,'개혁개방','Reform & opening','c','탈냉전']]},
+ kr:{ko:'한반도',en:'Korea',note:'한국사 교과서는 구석기를 전기(~약 10만 년 전)·중기(~4만)·후기(~1만)로 나눠 세계 일반 구분(약 30만·5만 년 전 경계)과 연대가 달라. 중석기는 있었는지 논쟁 중이고, 동기 시대 없이 청동기로 넘어가.',noteEn:'Korean textbooks date the Paleolithic subdivisions differently (≈100k / 40k / 10k years ago). A Mesolithic is debated, and there is no Copper Age.',s:[
+  [-123000,-100000,'전기 구석기','Lower Paleolithic','p'],[-100000,-40000,'중기 구석기','Middle Paleolithic','p'],[-40000,-10000,'후기 구석기','Upper Paleolithic','p'],[-10000,-8000,'중석기?(논쟁)','Mesolithic? (debated)','p','중석기'],[-8000,-2000,'신석기(빗살무늬토기)','Neolithic','p'],
+  [-2000,-400,'청동기(고조선)','Bronze Age (Gojoseon)','a','청동기 / 상고대'],[-400,-100,'초기 철기','Early Iron Age','a','철기'],[-100,300,'원삼국','Proto–Three Kingdoms','a','철기'],[300,676,'삼국','Three Kingdoms','a','고대'],[676,935,'남북국','North–South States','a','고대'],
+  [935,1392,'고려','Goryeo','m','중세'],[1392,1592,'조선 전기','Early Joseon','e','근세'],[1592,1876,'조선 후기','Late Joseon','e','근세'],[1876,1910,'개항기','Opening ports','n','근대'],[1910,1945,'일제 강점기','Japanese occupation','n','근대'],
+  [1945,1987,'분단·산업화','Division & industrialization','c','현대'],[1987,2025,'민주화·정보화','Democratization & information age','c','현대']]},
+ jp:{ko:'일본',en:'Japan',note:'일본 구석기 유적은 대부분 약 3만 8천 년 전 이후야. 조몬 토기가 매우 이르고(약 1만 6천 년 전), 청동기와 철기가 야요이 때 거의 함께 들어와서 \'청동기 시대\'를 따로 두지 않아.',noteEn:'Most Japanese Paleolithic sites postdate ~38k years ago; Jōmon pottery is very early, and bronze and iron arrived together in the Yayoi period, so there is no separate Bronze Age.',s:[
+  [-123000,-38000,'사람 흔적 드묾(논쟁)','Sparse/debated evidence','p'],[-38000,-14000,'구석기','Paleolithic','p'],[-14000,-1000,'조몬(신석기)','Jōmon','p','신석기'],[-1000,250,'야요이(청동·철)','Yayoi','a','청동기·철기'],[250,538,'고분','Kofun','a','고대'],[538,794,'아스카·나라','Asuka–Nara','a','고대'],[794,1185,'헤이안','Heian','a','고대'],
+  [1185,1333,'가마쿠라','Kamakura','m','중세'],[1333,1573,'무로마치','Muromachi','m','중세'],[1573,1603,'아즈치모모야마','Azuchi–Momoyama','e','근세'],[1603,1868,'에도','Edo','e','근세'],[1868,1945,'메이지~쇼와 전전','Meiji–prewar Shōwa','n','근대'],[1945,1989,'전후 쇼와','Postwar Shōwa','c','현대'],[1989,2025,'헤이세이·레이와','Heisei–Reiwa','c','현대']]},
+ sa:{ko:'남아시아',en:'South Asia',note:'인더스 문명(청동기)이 무너진 뒤 베다 시대에 철기가 들어와. 중세·근세 구분은 왕조(델리 술탄·무굴)로 하는 경우가 많아.',noteEn:'After the Bronze Age Indus civilization, iron arrives in the Vedic period; medieval/early-modern divisions follow dynasties (Delhi Sultanate, Mughals).',s:[
+  [-123000,-45000,'중기 구석기','Middle Paleolithic','p'],[-45000,-10000,'후기 구석기','Upper Paleolithic','p'],[-10000,-7000,'중석기','Mesolithic','p'],[-7000,-4000,'신석기(메르가르)','Neolithic (Mehrgarh)','p'],[-4000,-2600,'동기(초기 하라파)','Chalcolithic','p'],
+  [-2600,-1900,'청동기·인더스 문명','Indus civilization','a','청동기 / 상고대'],[-1900,-1200,'후기 하라파·초기 베다','Late Harappan / early Vedic','a'],[-1200,-600,'철기·베다','Iron Age, Vedic','a','철기'],[-600,-185,'십육대국·마우리아','Mahājanapadas, Maurya','a','고전 고대'],[-185,550,'쿠샨·굽타','Kushan, Gupta','a','고전 고대'],
+  [550,1206,'지역 왕국','Regional kingdoms','m','전기·성기 중세'],[1206,1526,'델리 술탄','Delhi Sultanate','m','후기 중세'],[1526,1757,'무굴','Mughal','e','근세'],[1757,1947,'영국 지배','British rule','n','근대'],[1947,1991,'독립·분할 이후','Independence','c','냉전'],[1991,2025,'자유화·정보화','Liberalization','c','탈냉전']]},
+ af:{ko:'사하라 이남 아프리카',en:'Sub-Saharan Africa',note:'아프리카 고고학은 전기·중기·후기 석기 시대(ESA·MSA·LSA)로 나누고, 대부분 지역은 청동기 없이 석기에서 철기로 바로 넘어가. 연대는 지역마다 차이가 매우 커.',noteEn:'African archaeology uses Earlier/Middle/Later Stone Age; most regions go straight from stone to iron without a Bronze Age. Dates vary greatly by region.',s:[
+  [-123000,-40000,'중기 석기 시대(MSA)','Middle Stone Age','p','중기 구석기'],[-40000,-800,'후기 석기 시대(LSA)','Later Stone Age','p','후기 구석기~신석기'],[-800,700,'철기·반투 확산','Iron Age, Bantu expansion','a','철기'],
+  [700,1500,'왕국 시대(가나·말리·짐바브웨)','Kingdoms (Ghana, Mali, Zimbabwe)','m','중세'],[1500,1885,'대서양 노예무역 시대','Atlantic slave-trade era','e','근세'],[1885,1960,'식민지','Colonial era','n','근대'],[1960,1991,'독립·냉전','Independence','c','냉전'],[1991,2025,'탈냉전','Post–Cold War','c']]},
+ am:{ko:'아메리카',en:'Americas',note:'메소아메리카(멕시코·과테말라) 기준이야. 사람이 처음 들어온 시기는 약 2만 3천~1만 6천 년 전으로 논쟁 중이고, 구대륙식 청동기·철기 구분 대신 고기·형성기·고전기·후고전기를 써.',noteEn:'Mesoamerican scheme. First arrival (≈23k–16k years ago) is debated; Archaic/Formative/Classic/Postclassic replace Bronze/Iron Ages.',s:[
+  [-123000,-21000,'사람 없음(논쟁)','No people (debated)','p'],[-21000,-8000,'고인디언기','Paleo-Indian','p','후기 구석기'],[-8000,-2000,'고기(아케익)','Archaic','p','중석기~신석기'],[-2000,250,'형성기(올멕)','Formative (Olmec)','a','상고대'],[250,900,'고전기(마야)','Classic (Maya)','a','고대'],[900,1521,'후고전기(아스테카)','Postclassic (Aztec)','m','중세'],
+  [1521,1810,'식민지','Colonial','e','근세'],[1810,1910,'독립·국가 형성','Independence','n','근대'],[1910,1945,'혁명·대공황','Revolution & Depression','c','초기 현대'],[1945,1991,'냉전','Cold War','c'],[1991,2025,'탈냉전','Post–Cold War','c']]},
+ oc:{ko:'오세아니아',en:'Oceania',note:'오스트레일리아에 사람이 온 시기는 약 6만 5천~5만 년 전으로 논쟁 중이야. 원주민 사회에는 구대륙식 석기·금속 시대 구분을 쓰지 않아. 태평양 섬들은 라피타인(약 3천 5백 년 전)부터야.',noteEn:'First arrival in Australia (≈65k–50k years ago) is debated; Old-World stone/metal ages are not applied to Aboriginal societies. Pacific islands are settled from Lapita times (~3,500 years ago).',s:[
+  [-123000,-50000,'사람 도착 이전(논쟁)','Before arrival (debated)','p'],[-50000,1788,'원주민 사회','Aboriginal societies','p','선사'],[1788,1901,'영국 식민','British colonization','n','근대'],[1901,1945,'연방·세계 대전','Federation & wars','c','초기 현대'],[1945,1991,'냉전','Cold War','c'],[1991,2025,'탈냉전','Post–Cold War','c']]}
+};
+ERA_REG.gl=JSON.parse(JSON.stringify(ERA_REG.eu)); ERA_REG.gl.ko='일반(유럽 기준)'; ERA_REG.gl.en='General (European)'; ERA_REG.gl.note='화면 가운데가 특정 지역이 아니라서 가장 널리 쓰는 유럽식 구분을 보여 줘.'; ERA_REG.gl.noteEn='Showing the common European scheme because the view is not centered on a region.';
+function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
+  if(lat>=33&&lat<=43.5&&lon>=124&&lon<=131.5) return 'kr';
+  if(lat>=24&&lat<=46&&lon>=129.5&&lon<=150) return 'jp';
+  if((lat>=5&&lat<=30&&lon>=60&&lon<=97)||(lat>30&&lat<=37&&lon>=60&&lon<=78)) return 'sa';
+  if(lat>=18&&lat<=54&&lon>=73&&lon<=135) return 'cn';
+  if((lat>=12&&lat<=42&&lon>=26&&lon<=63)||(lat>=15&&lat<=37&&lon>=-17&&lon<26)) return 'ne';
+  if(lat>=35&&lat<=72&&lon>=-25&&lon<=45) return 'eu';
+  if(lat>=-36&&lat<15&&lon>=-20&&lon<=52) return 'af';
+  if(lon>=-170&&lon<=-30&&lat>=-56&&lat<=72) return 'am';
+  if((lat>=-50&&lat<=0&&lon>=110)||(lon>=150||lon<=-150)) return 'oc';
+  return 'gl'; }
+(function(){
+  var bar=$('#bar'); if(!bar) return;
+  var en=function(){ return LANG==='en'; };
+  var HUE={p:'#a3a86a',a:'#6fa3b8',m:'#a58cc0',e:'#d0a860',n:'#6fb58a',c:'#c27d7d'};
+  var st=document.createElement('style'); st.textContent=[
+    '#eraSub,#eraLin{position:relative;height:12px;border-radius:4px;overflow:hidden;margin-top:3px;cursor:pointer;user-select:none;touch-action:none}',
+    '#eraLin{height:7px;margin-top:3px;opacity:.95}',
+    '#eraSub .sg,#eraLin .sg{position:absolute;top:0;bottom:0;overflow:hidden;white-space:nowrap;font-size:9.5px;line-height:12px;padding-left:3px;box-sizing:border-box;border-right:1px solid rgba(0,0,0,.08)}',
+    '#eraSub .cur,#eraLin .cur{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink);opacity:.85;pointer-events:none}',
+    '#timeSub{flex:0 1 auto!important}#eraNote{flex:1 1 auto;font-size:11.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;cursor:help}',
+    'body:not(.mHistOn) #eraSub,body:not(.mHistOn) #eraLin,body:not(.mHistOn) #eraNote{display:none}',
+    '@media (max-width:760px){#eraNote{display:none!important}#timeInput{flex:0 1 74px!important;min-width:44px!important;width:auto!important}}',
+    'body.cosmo #eraSub,body.cosmo #eraLin,body.cosmo #eraNote{display:none}'
+  ].join('\n'); document.head.appendChild(st);
+  var sub=document.createElement('div'); sub.id='eraSub'; var lin=document.createElement('div'); lin.id='eraLin';
+  bar.parentNode.insertBefore(sub,bar.nextSibling); sub.parentNode.insertBefore(lin,sub.nextSibling);
+  var note=document.createElement('span'); note.id='eraNote'; var ts=$('#timeSub'); ts.parentNode.insertBefore(note,ts.nextSibling);
+  var Y0=-123000, Y1=2025, reg=null, built='';
+  function lx(y){ return (y-Y0)/(Y1-Y0); }
+  function tone(c,i){ var t=barTone(c); if(!t||!t.bg) return {bg:c,ink:'#111'}; return {bg:t.bg,ink:t.ink,alt:i%2}; }
+  function build(){ var R=ERA_REG[reg], E=en(), key=reg+'|'+LANG+'|'+document.documentElement.getAttribute('data-theme'); if(key===built) return; built=key;
+    var hs='', hl=''; R.s.forEach(function(s,i){ var a=v2t(s[0]), b=v2t(s[1]), t=tone(HUE[s[4]],i), nm=E?s[3]:s[2], tip=nm+' · '+fmtYear(s[0])+' ~ '+(s[1]>=2025?(E?'now':'현재'):fmtYear(s[1]))+(s[5]?' ('+(E?'':'일반 구분: ')+s[5]+')':'');
+      var sty='background:'+t.bg+';color:'+t.ink+';filter:brightness('+(i%2?0.93:1.04)+')';
+      hs+='<div class="sg" data-y="'+s[0]+'" title="'+esc(tip)+'" style="left:'+(a*100)+'%;width:'+((b-a)*100)+'%;'+sty+'">'+((b-a)*bar.clientWidth>46?esc(nm):'')+'</div>';
+      var la=lx(s[0]), lb=lx(s[1]); hl+='<div class="sg" data-y="'+s[0]+'" title="'+esc(tip)+'" style="left:'+(la*100)+'%;width:'+((lb-la)*100)+'%;'+sty+'"></div>'; });
+    sub.innerHTML=hs+'<i class="cur"></i>'; lin.innerHTML=hl+'<i class="cur"></i>';
+    lin.title=E?'True-scale timeline (123,000 years ago → now): everything after farming is the thin sliver at the right.':'실제 시간 비율 막대(12만 3천 년 전 → 지금): 농경 이후 역사 전체가 오른쪽 끝 얇은 띠야.';
+    note.textContent=(E?'Periods: ':'시대 구분: ')+(E?R.en:R.ko)+' ⓘ'; note.title=E?R.noteEn:R.note; cur(); }
+  function cur(){ if(S.mode!=='hist') return; var y=S.year; var a=sub.querySelector('.cur'), b=lin.querySelector('.cur'); if(a) a.style.left=(v2t(y)*100)+'%'; if(b) b.style.left=(lx(y)*100)+'%'; }
+  function tick(){ document.body.classList.toggle('mHistOn',S.mode==='hist'); if(S.mode!=='hist') return; var r=eraRegionAt(cam.lat,cam.lon); if(r!==reg){ reg=r; built=''; } build(); cur(); }
+  setInterval(tick,500); addEventListener('resize',function(){ built=''; tick(); });
+  new MutationObserver(function(){ built=''; tick(); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  function pick(el,linear){ var down=false; function at(e){ var r=el.getBoundingClientRect(), f=clamp((e.clientX-r.left)/r.width,0,1), v=linear?Y0+f*(Y1-Y0):t2v(f); var stp=Math.abs(v)>5000?500:(v<-1000?50:v<0?10:5); setYear(Math.round(v/stp)*stp||1); cur(); }
+    el.addEventListener('pointerdown',function(e){ down=true; el.setPointerCapture(e.pointerId); at(e); }); el.addEventListener('pointermove',function(e){ if(down) at(e); }); el.addEventListener('pointerup',function(){ down=false; }); }
+  pick(sub,false); pick(lin,true);
+  var _tc=timeChanged; timeChanged=function(){ var r=_tc.apply(this,arguments); try{ cur(); }catch(e){} return r; };
+  tick();
+})();
+
+/* v76 첫 로딩 인트로(주마등) 플레이어
+   intro/manifest.json 이 있을 때만 켜진다: {"scenes":[{"img":"intro/01.webp","t":"우주의 탄생","en":"Birth of the universe","dur":2.6,"kb":[1.12,1,"50% 50%"]}...]}
+   - 장면마다 켄 번스(천천히 다가가거나 물러남) + 0.7초 겹침 전환
+   - 처음 방문 때만 자동 재생(다시 보기는 ?intro=1), 아무 데나 누르거나 '건너뛰기'로 넘김
+   - 끝나면 마지막 장면(지구)이 작아지며 실제 지구본으로 줌아웃 */
+(function(){
+  var q=location.search, force=/[?&]intro=1/.test(q); var seen=false; try{ seen=localStorage.getItem('tg_intro')==='1'; }catch(e){}
+  if(/[?&]intro=0/.test(q)||(seen&&!force)||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches&&!force)) return;
+  fetch('intro/manifest.json',{cache:'no-cache'}).then(function(r){ return r.ok?r.json():null; }).then(function(M){ if(M&&M.scenes&&M.scenes.length) run(M); }).catch(function(){});
+  function run(M){ var en=LANG==='en';
+    var st=document.createElement('style'); st.textContent=[
+      '#intro{position:fixed;inset:0;z-index:200;background:#000;overflow:hidden;cursor:pointer;transition:opacity .9s ease}',
+      '#intro .sc{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity .7s ease;will-change:transform,opacity}',
+      '#intro .sc.on{opacity:1}',
+      '#intro .cap{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 54px);text-align:center;color:#fff;font:600 clamp(16px,2.6vw,26px) "Gowun Batang",Georgia,serif;text-shadow:0 2px 14px rgba(0,0,0,.7);opacity:0;transition:opacity .5s ease;pointer-events:none;padding:0 16px}',
+      '#intro .cap.on{opacity:.95}',
+      '#intro .skip{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);border:0;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}',
+      '#intro .bar{position:absolute;left:0;bottom:0;height:2px;background:rgba(255,255,255,.55);width:0}',
+      '#intro.out{opacity:0;pointer-events:none}'].join(''); document.head.appendChild(st);
+    var box=document.createElement('div'); box.id='intro'; box.innerHTML='<div class="cap"></div><button class="skip">'+(en?'Skip ›':'건너뛰기 ›')+'</button><div class="bar"></div>'; document.body.appendChild(box);
+    var cap=box.querySelector('.cap'), bar=box.querySelector('.bar'), S2=M.scenes, els=[], total=0;
+    S2.forEach(function(s){ var d=document.createElement('div'); d.className='sc'; d.style.backgroundImage='url("'+s.img+'")'; box.insertBefore(d,cap); els.push(d); total+=(s.dur||2.6); var im=new Image(); im.src=s.img; });
+    var i=-1, t0=performance.now(), done=false, timer=0;
+    function show(k){ if(done) return; if(k>=S2.length){ finish(); return; } var s=S2[k], d=els[k], kb=s.kb||[1.1,1,'50% 50%'];
+      d.style.transformOrigin=kb[2]||'50% 50%'; d.style.transition='none'; d.style.transform='scale('+kb[0]+')'; void d.offsetWidth;
+      var fd=s.fade||Math.min(0.5,(s.dur||2.6)*0.55); d.style.transition='opacity '+fd+'s ease, transform '+((s.dur||2.6)+fd+0.2)+'s linear'; d.style.transform='scale('+kb[1]+')'; d.classList.add('on'); if(k>0){ var pv=els[k-1]; setTimeout(function(){ pv.classList.remove('on'); },fd*1000+30); }
+      cap.classList.remove('on'); setTimeout(function(){ cap.textContent=en?(s.en||s.t||''):(s.t||''); cap.classList.toggle('on',!!(s.t||s.en)); },Math.min(260,fd*600));
+      i=k; timer=setTimeout(function(){ show(k+1); },(s.dur||2.6)*1000); }
+    (function prog(){ if(done) return; bar.style.width=Math.min(100,(performance.now()-t0)/(total*10))+'%'; requestAnimationFrame(prog); })();
+    function finish(){ if(done) return; done=true; clearTimeout(timer); try{ localStorage.setItem('tg_intro','1'); }catch(e){}
+      var go=function(){ try{ if(typeof cam!=='undefined'&&typeof animTo==='function'){ var d0=cam.dist; cam.dist=Math.max(1.12,d0*0.42); if(typeof updateCam==='function') updateCam(); animTo(null,null,d0,2200); } }catch(e){}
+        var last=els[i]; if(last){ last.style.transition='opacity .9s ease, transform 1.4s cubic-bezier(.5,0,.2,1)'; last.style.transform='scale(.35)'; } box.classList.add('out'); setTimeout(function(){ box.remove(); },1000); };
+      if(window.__booted) go(); else { cap.textContent=en?'Loading the Earth…':'지구를 불러오는 중…'; cap.classList.add('on'); var w=setInterval(function(){ if(window.__booted){ clearInterval(w); go(); } },200); } }
+    box.addEventListener('click',function(e){ if(e.target.classList.contains('skip')||i>=0) finish(); });
+    show(0);
+  }
 })();
 
 /* ================= 얕은 물 파동 물리(충돌 장면) =================
@@ -8843,4 +9145,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=23d864aa6d"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=cbb8009e54"); });</script></body></html>
