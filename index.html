@@ -338,7 +338,7 @@ body.ui-off #gHud{transform:translate(-50%,-140%);opacity:0;pointer-events:none}
 @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
 </style>
 
-<div id="sizer" aria-hidden="true"></div><div id="loading"><div class="ldBox"><div class="ldT">시간 지구본</div><div class="ldS">빅뱅부터 오늘까지</div><div class="ldM" id="ldMsg">지구를 불러오는 중…</div></div></div>
+<div id="sizer" aria-hidden="true"></div><div id="loading"><div class="ldBox"><div class="ldT">시간 지구본</div><div class="ldS">빅뱅부터 오늘까지</div><div class="ldM" id="ldMsg">지구를 불러오는 중…</div><div class="ldM" id="ldSafe" hidden></div></div></div>
 <div id="stage"><div id="tone" aria-hidden="true"></div><canvas id="gl" aria-label="지구본. 드래그로 회전, 휠·핀치로 확대, 탭하면 그 자리의 정보"></canvas><canvas id="ov"></canvas></div>
 <div id="tip" hidden></div>
 
@@ -667,7 +667,8 @@ var canvas=$('#gl'), ovc=$('#ov'), ov=ovc.getContext('2d');
 var LITE=(function(){ try{ return matchMedia('(pointer:coarse)').matches||Math.min(screen.width,screen.height)<700||/lite=1/.test(location.search); }catch(e){ return false; } })();
 var renderer;
 /* v72 직전 실행이 켜진 지 20초 안에 죽었으면(휴대폰 메모리 부족 '앗, 이런!') 이번엔 안전 모드: 가벼운 그림 + 화면 배율 1 */
-var SAFE=false; try{ if(localStorage.getItem('tg_boot')==='1'){ SAFE=true; LITE=true; } localStorage.setItem('tg_boot','1'); setTimeout(function(){ try{ localStorage.removeItem('tg_boot'); }catch(e){} },20000); }catch(e){}
+window.crumb=function(st){ try{ var m=performance.memory; localStorage.setItem('tg_crumb',st+' · '+(Math.round(performance.now()/100)/10)+'초'+(m?' · 메모리 '+Math.round(m.usedJSHeapSize/1e6)+'MB':'')); }catch(e){} };
+var SAFE=false; try{ if(localStorage.getItem('tg_boot')==='1'){ SAFE=true; LITE=true; window.__lastCrumb=localStorage.getItem('tg_crumb')||''; } localStorage.setItem('tg_boot','1'); setTimeout(function(){ try{ localStorage.removeItem('tg_boot'); }catch(e){} },20000); }catch(e){}
 /* v71 휴대폰에서 'Error creating WebGL context' — 조건을 하나씩 낮춰 가며 다시 시도(안티앨리어싱·고성능 요청·WebGL2 순으로 내려놓음) */
 (function(){
   var tries=[{antialias:!LITE,powerPreference:LITE?'low-power':'default'},
@@ -849,6 +850,7 @@ function showLines(key,v){ if(lineGroups[key]) lineGroups[key].visible=v; dirty=
 /* ================= 오버레이 텍스처(국가 채움·기후대·빙상) ================= */
 var eqProj=d3.geoEquirectangular().scale(OVW/(2*Math.PI)).translate([OVW/2,OVH/2]).precision(LITE?0.4:0.2);
 var eqPath=d3.geoPath(eqProj,ovCtx);
+if(SAFE){ try{ var _ls=document.getElementById('ldSafe'); if(_ls){ _ls.hidden=false; _ls.style.cssText='margin-top:8px;font-size:11px;color:#c9a27a;padding:0 16px'; _ls.textContent='지난번엔 「'+(window.__lastCrumb||'모름')+'」에서 꺼졌어 → 가벼운 안전 모드로 열게 (이 줄을 캡처해 주면 원인 찾기 쉬워)'; } }catch(e){} }
 
 /* ================= 지표 텍스처 관리 ================= */
 var TEX={}; // 이름 → THREE.Texture (지연 로드)
@@ -8215,8 +8217,8 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
     '#tCtl .tRows .dialrow .lab{display:none!important}',
     /* 예전 단추들은 숨기고(다른 기능이 부를 수 있게 남겨 둠) 노브만 */
     '#tCtl #prevK,#tCtl #nextK,#tCtl #mBig,#tCtl #mOne,#tCtl #pOne,#tCtl #pBig,#tCtl #ySlow,#tCtl #yRev,#tCtl #play,#tCtl #yFast,#tCtl #ySpd,#tCtl #dayRow [data-dd],#tCtl #dSlow,#tCtl #dRev,#tCtl #dPlay,#tCtl #dFast,#tCtl #dSpd{display:none!important}',
-    '#tCtl .tBox{flex:none;width:128px;display:flex;align-items:stretch;border-radius:10px;background:var(--fillB);overflow:hidden;min-height:30px}',
-    '#tCtl .tSide{flex:none;width:26px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;line-height:1;cursor:pointer;padding:0;transition:background-color .16s ease}',
+    '#tCtl .tBox{flex:none;width:auto;display:flex;align-items:stretch;border-radius:10px;background:var(--fillB);overflow:hidden;min-height:30px}',
+    '#tCtl .tSide{flex:none;width:24px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;line-height:1;cursor:pointer;padding:0;transition:background-color .16s ease}',
     /* 올림 표시: 바깥쪽이 진하고 가운데 노브 쪽으로 사라지게 */
     '#tCtl .tSide:first-child:hover{background:linear-gradient(90deg,var(--fillH),transparent)}',
     '#tCtl .tSide:last-child:hover{background:linear-gradient(270deg,var(--fillH),transparent)}',
@@ -8228,16 +8230,19 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
     '#tCtl .drum .strip.anim{transition:transform .16s cubic-bezier(.2,.8,.2,1)}',
     '#tCtl .drum .it{height:20px;line-height:20px;text-align:center;font-size:11.5px;color:var(--ink-2);white-space:nowrap;cursor:pointer;font-variant-numeric:tabular-nums}',
     '#tCtl .drum .it.on{color:var(--accent);font-weight:700;font-size:12.5px}',
-    '@media (max-width:720px){#tCtl .tBox{width:104px}#tCtl .tSide{width:22px}}'
+    '@media (max-width:720px){#tCtl .tSide{width:22px}}'
   ].join(''); document.head.appendChild(st);
 
   /* ---------- 드럼(돌려 고르는 노브) ---------- */
   function drum(el,vert,items,get,set){ var strip=el.querySelector('.strip'), W=3;   /* 위아래로 3칸씩 보여 주고, 끝에서 다시 처음으로 이어져 */
     function render(shift){ var L=items(), n=L.length; if(!n) return; var i=((get()%n)+n)%n, h='';
       for(var k=-W;k<=W;k++){ var j=((i+k)%n+n)%n, t=L[j]; h+='<div class="it'+(k===0?' on':'')+'" data-k="'+j+'"'+(t[1]?' title="'+esc(t[1])+'"':'')+'>'+esc(t[0])+'</div>'; }
-      strip.innerHTML=h; var base=el.clientHeight/2-(W+0.5)*20;
+      strip.innerHTML=h; fit(L); var base=el.clientHeight/2-(W+0.5)*20;
       strip.classList.remove('anim'); strip.style.transform='translateY('+(base+(shift||0)*20)+'px)';
       if(shift){ void strip.offsetWidth; strip.classList.add('anim'); strip.style.transform='translateY('+base+'px)'; } }
+    /* v73 드럼 폭 = 목록에서 가장 긴 글자 폭 + 좌우 6px — 기호(−/+, ◀/▶)와 드럼 사이가 휑하지 않게 */
+    var fitKey='', mc=document.createElement('canvas').getContext('2d');
+    function fit(L){ var k=L.map(function(t){ return t[0]; }).join('|'); if(k===fitKey) return; fitKey=k; mc.font='700 12.5px '+getComputedStyle(el).fontFamily; var mx=0; L.forEach(function(t){ mx=Math.max(mx,mc.measureText(t[0]).width); }); el.style.flex='none'; el.style.width=Math.ceil(mx+12)+'px'; }
     function step(d){ var n=items().length; if(!n) return; set(((get()+d)%n+n)%n); render(d); }
     var acc=0; el.addEventListener('wheel',function(e){ e.preventDefault(); acc+=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX); var th=e.deltaMode?1:40; while(Math.abs(acc)>=th){ step(acc>0?1:-1); acc-=th*(acc>0?1:-1); } },{passive:false});
     var down=null, moved=false; el.addEventListener('pointerdown',function(e){ down={y:e.clientY,a:0}; moved=false; el.setPointerCapture(e.pointerId); });
@@ -8571,15 +8576,15 @@ document.addEventListener('pointerdown',function(e){ if(!e.target.closest('#sear
 window.addEventListener('resize',layout);
 
 /* ---------- 시작 ---------- */
-var bootN=0, bootT=9; function bootTick(n){ bootN++; window.__stage='자료 '+bootN+'/'+bootT+' ('+n+')'; var l=document.getElementById('ldMsg'); if(l) l.textContent=(LANG==='en'?'Loading the globe… ':'지구를 불러오는 중… ')+Math.round(bootN/bootT*100)+'%'; }
+var bootN=0, bootT=7; function bootTick(n){ bootN++; window.__stage='자료 '+bootN+'/'+bootT+' ('+n+')'; crumb(window.__stage); var l=document.getElementById('ldMsg'); if(l) l.textContent=(LANG==='en'?'Loading the globe… ':'지구를 불러오는 중… ')+Math.round(bootN/bootT*100)+'%'; }
 window.__stage='자료 요청';
 Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(function(n){ return getJSON('data/'+n+'.json').then(function(d){ bootTick(n); return d; }); }).concat([getJSON('data/events.json').catch(function(){return []}),getJSON('data/polinfo.json').catch(function(){return {}})]))
 .then(function(r){
   INDEX=r[0]; PLACES=r[1]; LAND={topo:r[2]}; GEO=r[3]; SKY=r[4]; GEOLABELS=r[5]; RIVERS=r[6]; EVENTS=r[7]; POLINFO=r[8]; YEARS=INDEX.years;
-  window.__stage='장면 구성'; buildStaticLines(); buildSky(); buildSearch(); buildLayersPanel(); buildBar();
+  window.__stage='장면 구성'; crumb('선 그리기'); buildStaticLines(); crumb('하늘 만들기'); buildSky(); crumb('검색·패널'); buildSearch(); buildLayersPanel(); buildBar(); crumb('연표·칩');
   $('#mGeo').setAttribute('aria-pressed',S.mode==='geo'); $('#mHist').setAttribute('aria-pressed',S.mode==='hist'); $('#chrono').hidden=S.mode!=='geo'; $('#evChips').hidden=S.mode!=='hist'; evChipsRender();
-  layout(); if(W/H<0.8){ cam.dist=S.mode==='geo'?7:6.2; updateCam(); } applyOpt(); timeChanged();
-  fillI18NFromData(); $('#loading').hidden=true; if(S.mode==='geo') setTimeout(preWarm,4000); window.__booted=true; requestAnimationFrame(loop);
+  crumb('화면 배치'); layout(); if(W/H<0.8){ cam.dist=S.mode==='geo'?7:6.2; updateCam(); } crumb('설정 적용'); applyOpt(); crumb('연도 자료·국경'); timeChanged(); crumb('첫 그리기 직전');
+  fillI18NFromData(); $('#loading').hidden=true; if(S.mode==='geo') setTimeout(preWarm,4000); window.__booted=true; requestAnimationFrame(loop); (function(){ var f=0; function cf(){ f++; if(f===1||f===30||f===300) crumb('그리기 '+f+'번째 장면'); if(f<301) requestAnimationFrame(cf); } requestAnimationFrame(cf); [5,10,18].forEach(function(t){ setTimeout(function(){ crumb('켜진 뒤 '+t+'초'); },t*1000); }); })();
   getJSON('data/korea_regional.json').then(function(d){ KOREG=d; S.regI=undefined; if(S.mode==='hist') applyHistYear(); }).catch(function(){});
   getJSON('data/ethlang.json').then(function(d){ ETHL=d; if(S.sel&&S.sel.type==='polity') renderCard(); }).catch(function(){});
   getJSON('data/lakes.json').then(function(L){ setLines('lakes',buildLines(L.lines.map(function(r){ return {p:r}; }),{color:'#3a8fd0',opacity:0.85,r:1.0014,step:3})); L.labels.forEach(function(g){ GEOLABELS.push(g); addI18N(g[0],g[1]); }); visByTime.key=null; visByTime(); dirtyOv=true; }).catch(function(){});
@@ -8590,4 +8595,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=363b902e8d"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=1339dc26ff"); });</script></body></html>
