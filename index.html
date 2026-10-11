@@ -1315,10 +1315,10 @@ function glowSprite(c1,c2,size){ var cv=document.createElement('canvas'); cv.wid
   var s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})); s.scale.set(size,size,1); return s; }
 var sunSprite=glowSprite('rgba(255,248,225,1)','rgba(255,200,110,.35)',16); scene.add(sunSprite);
 // 달: 실제 표면(NASA 기반 three.js 예제 텍스처). 바다(마리아)는 약 39억~31억 년 전에 생겨서 그 이전엔 흐리게, 45억 년 전 무렵엔 마그마 바다
-var moonU={t:{value:blankTex},sunDir:globeU.sunDir,maria:{value:1},magma:{value:0},uTime:{value:0},ecl:{value:0},gA:{value:0}};
+var moonU={t:{value:blankTex},sunDir:globeU.sunDir,maria:{value:1},magma:{value:0},uTime:{value:0},ecl:{value:0},gA:{value:0},gN:{value:0}};
 var moon=new THREE.Mesh(new THREE.SphereGeometry(0.2727,64,32),new THREE.ShaderMaterial({uniforms:moonU,
   vertexShader:'varying vec2 vU; varying vec3 vN,vO; void main(){ vU=uv; vO=normal; vN=normalize(mat3(modelMatrix)*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
-  fragmentShader:['uniform sampler2D t; uniform vec3 sunDir; uniform float maria,magma,uTime,ecl,gA; varying vec2 vU; varying vec3 vN,vO;',
+  fragmentShader:['uniform sampler2D t; uniform vec3 sunDir; uniform float maria,magma,uTime,ecl,gA,gN; varying vec2 vU; varying vec3 vN,vO;',
    'float h3(vec3 p){ return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453); }',
    'float n3(vec3 p){ vec3 i=floor(p),f=fract(p); f=f*f*f*(f*(f*6.0-15.0)+10.0); return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z); }',
    'float fb3(vec3 p){ return n3(p)*0.5+n3(p*2.03)*0.25+n3(p*4.1)*0.125+n3(p*8.3)*0.0625; }',
@@ -1330,7 +1330,7 @@ var moon=new THREE.Mesh(new THREE.SphereGeometry(0.2727,64,32),new THREE.ShaderM
    ' vec3 o=normalize(vO)*4.0; vec3 q=o+vec3(fb3(o*0.8+uTime*0.01),fb3(o*0.8+7.0),fb3(o*0.8+13.0))*1.2; float rid=1.0-abs(fb3(q)*2.0-1.0), rid2=1.0-abs(fb3(q*2.7+3.0)*2.0-1.0);',
    ' float T=pow(rid,14.0)*0.95+pow(rid2,22.0)*0.5+smoothstep(0.62,0.8,fb3(o*0.6+2.0))*0.6+0.08*fb3(o*3.0);',
    ' vec3 lava=mix(vec3(0.07,0.04,0.03),vec3(0.45,0.07,0.02),smoothstep(0.0,0.35,T)); lava=mix(lava,vec3(1.0,0.5,0.12),smoothstep(0.3,0.7,T)); lava=mix(lava,vec3(1.0,0.88,0.6),smoothstep(0.75,1.0,T));',
-   ' vec3 fc=mix(lit,lava*(0.6+0.4*d)+lava*0.4,magma); float lum=dot(fc,vec3(0.3,0.59,0.11)); float al=mix(1.0,clamp(lum*2.6-0.04,0.0,1.0)*0.94,gA); vec3 dayC=vec3(0.97,0.975,1.0)*clamp(0.62+lum*0.75,0.0,1.0); fc=mix(fc,dayC,gA*(1.0-magma)); gl_FragColor=vec4(fc,al); }'].join('\n')}));
+   ' vec3 fc=mix(lit,lava*(0.6+0.4*d)+lava*0.4,magma); fc*=1.0+0.32*gN; float lum=dot(fc,vec3(0.3,0.59,0.11)); float al=mix(1.0,clamp(lum*2.6-0.04,0.0,1.0)*0.94,gA); vec3 dayC=vec3(0.97,0.975,1.0)*clamp(0.62+lum*0.75,0.0,1.0); fc=mix(fc,dayC,gA*(1.0-magma)); gl_FragColor=vec4(fc,al); }'].join('\n')}));
 scene.add(moon);
 var sunLight=new THREE.DirectionalLight(0xffffff,1.1); scene.add(sunLight); scene.add(new THREE.AmbientLight(0x404a55,0.5));
 var moonAngle=1.2;
@@ -8423,6 +8423,20 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     '#linBox .le{stroke:var(--ink-2,#a19e98)}',
     '#linBox .lgrid{stroke:color-mix(in srgb,var(--ink,#fff) 9%,transparent)}',
     '#linBox .ltk{fill:var(--ink-2,#a19e98);font-size:11px}',
+    '#linBox .linTop{flex-wrap:nowrap!important;gap:8px!important}#linBox .linTop>b{flex:none}',
+    '#linBox .linMid{flex:1;min-width:0;display:flex;gap:8px;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 22px),transparent);padding:0 14px}',
+    '#linBox .linMid::-webkit-scrollbar{display:none}#linBox .linMid>*{flex:none}#linBox .linChips{flex-wrap:nowrap!important}#linBox .linChips button{flex:none;white-space:nowrap}',
+    '#linBox .linZoom{flex:none;margin-left:0!important}#linBox #linX{flex:none;margin-left:0!important}',
+    '#linBox .lg{display:block!important}#linBox .lgTop{display:flex;position:sticky;top:0;z-index:3}#linBox .lgRow{display:flex}',
+    '#linBox .lgC{flex:none;width:'+LW+'px;height:'+AH+'px}#linBox .lgT{position:static!important;flex:none}',
+    '#linBox .lgL{flex:none;position:sticky!important;left:0;width:'+LW+'px}#linBox .lgM{flex:none}',
+    '#linBox .linScroll{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink,#fff) 24%,transparent) transparent}',
+    '#linBox .linScroll::-webkit-scrollbar{width:0;height:8px}#linBox .linScroll::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink,#fff) 22%,transparent);border-radius:8px;border:0}#linBox .linScroll::-webkit-scrollbar-track{background:transparent}',
+    '#linBox .linMini{position:absolute!important;right:3px;top:4px;bottom:12px;width:12px!important;border-radius:6px;background:color-mix(in srgb,var(--ink,#fff) 6%,transparent)!important;opacity:.85;z-index:5}',
+    '#linBox .linMini i{left:3px!important;right:3px!important;opacity:.5!important}',
+    '#linBox .fdL,#linBox .fdR{position:absolute;top:0;bottom:8px;width:22px;pointer-events:none;z-index:4}',
+    '#linBox .fdL{left:'+LW+'px;background:linear-gradient(90deg,color-mix(in srgb,var(--panel-solid,#1e1f21) 92%,transparent),transparent)}',
+    '#linBox .fdR{right:0;background:linear-gradient(270deg,color-mix(in srgb,var(--panel-solid,#1e1f21) 92%,transparent),transparent)}',
     '#linBox .linMini{flex:none;width:16px;position:relative;cursor:pointer;background:color-mix(in srgb,var(--ink,#fff) 4%,transparent)}',
     '#linBox .linMini i{position:absolute;left:3px;right:3px;border-radius:2px;opacity:.55}',
     '#linBox .linMini b{position:absolute;left:0;right:0;border-radius:3px;background:color-mix(in srgb,var(--ink,#fff) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink,#fff) 35%,transparent);pointer-events:none}',
@@ -8443,11 +8457,11 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     var d=$('#linBox'); if(!d){ d=document.createElement('div'); d.id='linBox'; d.setAttribute('role','dialog'); document.body.appendChild(d); }
     var y0=Math.min.apply(null,LIN.map(function(n){ return n[2]; }))-80, lane={}, byId={}; LIN_T.forEach(function(t,i){ lane[t[0]]=i; }); LIN.forEach(function(n){ byId[n[0]]=n; });
     var col=ST.col[LIN_CUR]||(ST.col[LIN_CUR]={});
-    d.innerHTML='<div class="linTop"><b>'+(en?'Lineages':'계보·연표')+'</b><span class="seg linDom">'+Object.keys(LIN_SETS).map(function(k){ return '<button data-d="'+k+'" aria-pressed="'+(k===LIN_CUR)+'">'+esc(LIN_SETS[k].t)+'</button>'; }).join('')+'</span>'+
-      '<span class="linChips">'+LIN_T.map(function(t){ return '<button data-t="'+t[0]+'" style="border-color:'+t[2]+'">'+esc(t[1])+'</button>'; }).join('')+'<button data-t="">'+(en?'All':'전체')+'</button></span>'+
+    d.innerHTML='<div class="linTop"><b>'+(en?'Lineages':'계보·연표')+'</b><div class="linMid"><span class="seg linDom">'+Object.keys(LIN_SETS).map(function(k){ return '<button data-d="'+k+'" aria-pressed="'+(k===LIN_CUR)+'">'+esc(LIN_SETS[k].t)+'</button>'; }).join('')+'</span>'+
+      '<span class="linChips">'+LIN_T.map(function(t){ return '<button data-t="'+t[0]+'" style="border-color:'+t[2]+'">'+esc(t[1])+'</button>'; }).join('')+'<button data-t="">'+(en?'All':'전체')+'</button></span></div>'+
       '<span class="linZoom"><button class="step" data-z="-1" title="'+(en?'Zoom out time':'시간 축 줄이기')+'">−</button><button class="step" data-z="0" title="'+(en?'Reset':'원래 크기')+'">⟲</button><button class="step" data-z="1" title="'+(en?'Zoom in time':'시간 축 늘이기')+'">+</button></span>'+
-      '<button class="step" id="linX">✕</button></div><div class="linBody"><div class="linScroll"><div class="lg"></div></div><div class="linMini"></div></div><div class="linInfo" id="linInfo"></div>';
-    var sc=d.querySelector('.linScroll'), G=d.querySelector('.lg'), mini=d.querySelector('.linMini'), info=$('#linInfo');
+      '<button class="step" id="linX">✕</button></div><div class="linBody"><div class="linScroll"><div class="lg"></div></div><i class="fdL"></i><i class="fdR"></i><div class="linMini"></div></div><div class="linInfo" id="linInfo"></div>';
+    var sc=d.querySelector('.linScroll'), G=d.querySelector('.lg'), mini=d.querySelector('.linMini'), info=$('#linInfo'); var mid=d.querySelector('.linMid'); mid.addEventListener('wheel',function(e){ if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){ e.preventDefault(); mid.scrollLeft+=e.deltaY; } },{passive:false});
     var hint=en?'Wheel over the time row = zoom · Shift+wheel there = compress/expand ancient eras · click a lane name to fold it · ● person ▢ school/-ism ◆ work/event · dashed = debated influence.':'시간 줄 위에서 휠 = 시간 축 확대·축소 · Shift+휠 = 옛 시대 압축 비율 · 갈래 이름 누르면 접기/펴기 · ● 인물 ▢ 학파·사조 ◆ 저작·사건 · 점선 = 영향 관계가 느슨하거나 논쟁 중.';
     info.innerHTML='<span style="color:var(--ink-2)">'+hint+'</span>';
     var mc=document.createElement('canvas').getContext('2d'); mc.font='11.5px system-ui,sans-serif';
@@ -8471,13 +8485,13 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
       LIN.forEach(function(n){ var p=pos[n[0]], c=LIN_T[lane[n[3]]][2], folded=col[n[3]]; s+='<g class="ln '+(n[7]||'p')+'" data-id="'+n[0]+'" style="cursor:pointer"><title>'+esc(n[1]+' · '+yLabel(n[2],en))+'</title>'+(folded?'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3" fill="'+c+'"/>':shape(n,p,c)+'<text x="'+(p[0]+9)+'" y="'+(p[1]+4)+'">'+esc(n[1])+'</text>')+'</g>'; });
       s+='</svg>';
       var L='<div class="lgL" style="height:'+Hd+'px">'+LIN_T.map(function(t,i){ var cnt=LIN.filter(function(n){ return n[3]===t[0]; }).length; return '<div class="lnm" data-l="'+t[0]+'" style="top:'+laneY[i]+'px;height:'+(laneY[i+1]-laneY[i]-3)+'px;color:'+t[2]+';background:linear-gradient(90deg,'+t[2]+'1f,transparent)">'+(col[t[0]]?'▸ ':'▾ ')+esc(t[1])+(col[t[0]]?'':'<small>'+cnt+(en?' items':'개')+'</small>')+'</div>'; }).join('')+'</div>';
-      G.style.gridTemplateColumns=LW+'px '+Wd+'px'; G.style.gridTemplateRows=AH+'px '+Hd+'px';
-      G.innerHTML='<div class="lgC">'+(en?'lane / time':'갈래 · 시간')+'</div><div class="lgT">'+top+'</div>'+L+'<div class="lgM">'+s+'</div>';
+      G.style.width=(LW+Wd)+'px';
+      G.innerHTML='<div class="lgTop"><div class="lgC">'+(en?'lane / time':'갈래 · 시간')+'</div><div class="lgT">'+top+'</div></div><div class="lgRow">'+L+'<div class="lgM">'+s+'</div></div>';
       G.querySelectorAll('.lnm').forEach(function(el){ el.onclick=function(){ var k=el.dataset.l; col[k]=!col[k]; var keep=sc.scrollLeft; render(); sc.scrollLeft=keep; }; });
       G.querySelectorAll('.ln').forEach(function(g){ g.onclick=function(){ pick(g.dataset.id); }; });
       G.querySelector('.lgT').addEventListener('wheel',onWheel,{passive:false});
       if(cur) hi(lineage(cur),cur); miniDraw(); }
-    function miniDraw(){ var H=mini.clientHeight||1, tot=Hd+AH, k=H/tot, h=''; LIN_T.forEach(function(t,i){ h+='<i style="top:'+((laneY[i]+AH)*k)+'px;height:'+Math.max(2,(laneY[i+1]-laneY[i]-3)*k)+'px;background:'+t[2]+'"></i>'; });
+    function miniDraw(){ var fl=d.querySelector('.fdL'); if(fl){ fl.style.top=AH+'px'; } var H=mini.clientHeight||1, tot=Hd+AH, k=H/tot, h=''; LIN_T.forEach(function(t,i){ h+='<i style="top:'+((laneY[i]+AH)*k)+'px;height:'+Math.max(2,(laneY[i+1]-laneY[i]-3)*k)+'px;background:'+t[2]+'"></i>'; });
       h+='<b style="top:'+(sc.scrollTop*k)+'px;height:'+Math.max(6,Math.min(H,sc.clientHeight*k))+'px"></b>'; mini.innerHTML=h; }
     sc.addEventListener('scroll',miniDraw,{passive:true});
     function miniGo(e){ var r=mini.getBoundingClientRect(), f=(e.clientY-r.top)/r.height; sc.scrollTop=f*(Hd+AH)-sc.clientHeight/2; }
@@ -8587,7 +8601,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
 /* v76 — 검색창 접힘, 설명 카드(제목 고정·본문만 스크롤·위아래 안쪽 그라데이션), 켜짐 토글 통일, 내 위치 칸 투명, 지질 단위 테두리 회색 통일 */
 (function(){
   var en=LANG==='en';
-  try{ EV_COL.daily='#cbc157'; EV_CAT.daily='일상'; I18N['일상']='Daily life'; I18N['문학']='Literature'; I18N['검색']='Search'; PIN_EMO.daily='🍚'; var vi=EV_ORDER.indexOf('voyage'); if(EV_ORDER.indexOf('daily')<0) EV_ORDER.splice(vi+1,0,'daily'); if(typeof evChipsRender==='function') evChipsRender(); }catch(e){}
+  try{ EV_COL.daily='#cbc157'; EV_CAT.daily='일상'; I18N['일상']='Daily life'; I18N['문학']='Literature'; I18N['검색']='Search'; PIN_EMO.daily='🍚'; if(EV_ORDER.indexOf('daily')<0) EV_ORDER.push('daily'); if(typeof evChipsRender==='function') evChipsRender(); }catch(e){}
   var st=document.createElement('style'); st.id='v76ui';
   st.textContent=[
     /* 검색창: 비었고 초점 없을 땐 돋보기+'검색'만 */
@@ -8623,7 +8637,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
   if(wrap&&q){ if(lbl) lbl.textContent=en?'Search':'검색';
     var mc=document.createElement('canvas').getContext('2d');
     function fullW(){ mc.font='15px "IBM Plex Sans KR",system-ui,sans-serif'; var w=mc.measureText(q.placeholder||'').width+62; return Math.min(Math.max(320,w),innerWidth-88); }
-    function sync(){ var open=document.activeElement===q||q.value.trim()!==''; wrap.classList.toggle('col',!open); wrap.style.width=open?fullW()+'px':''; }
+    function sync(){ var open=true; wrap.classList.toggle('col',!open); wrap.style.width=''; }
     q.addEventListener('focus',sync); q.addEventListener('blur',function(){ setTimeout(sync,120); }); q.addEventListener('input',sync);
     $('#searchBox').addEventListener('pointerdown',function(e){ if(e.target!==q){ e.preventDefault(); q.focus(); } });
     addEventListener('resize',sync); sync(); }
@@ -8675,7 +8689,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     '#cosLinIn .cursor{position:absolute;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:#fff;border-radius:2px;box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}',
     '#cosLin{display:none!important}',
     '@media (max-width:640px){body.cosmo #top .row1{flex-wrap:wrap;row-gap:6px}body.cosmo #langBtn{margin-left:auto}body.cosmo #cosHdr{order:5;flex:1 1 40%;font-size:16px}body.cosmo #cosCtl{order:6;margin-left:auto}body.cosmo #langBtn,body.cosmo #themeBtn{order:2}}',
-    '#cosDet{height:86px!important}',
+    '#cosDet{height:76px!important}',
     '#cosmo .cosCard{max-height:calc(100% - 210px)!important}',
     /* 라이트 테마: 막대 바탕·커서 */
     ':root[data-theme="light"] #cosAbsIn,:root[data-theme="light"] #cosLinIn{background:var(--fillB)}',
@@ -8739,7 +8753,7 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,Wd,Hd); var w=COSMO.win||cosWin(), a=w[0], b=w[1], E=en(), Lt=isLight();
     var INK=Lt?'rgba(42,38,34,.85)':'rgba(225,228,235,.85)', TICK=Lt?'rgba(42,38,34,.4)':'rgba(200,210,230,.5)', MAIN=Lt?'#b7791f':'#ffd27a', SUB=Lt?'#1f7fae':'#7fd6ff', CUR=Lt?'#2a2622':'#fff';
     function X(t){ return 8+(Wd-16)*(t-a)/(b-a); }
-    var yB=Hd-34, hB=14;
+    var yB=43, hB=14;
     COS_BAND.forEach(function(bd){ if(bd[1]<a||bd[0]>b) return; var x0=Math.max(8,X(bd[0])), x1=Math.min(Wd-8,X(bd[1])); g.fillStyle=bd[4]; g.globalAlpha=Lt?0.35:0.55; g.fillRect(x0,yB,x1-x0,hB); g.globalAlpha=1; });
     g.font='10.5px system-ui,sans-serif'; g.textBaseline='top'; g.fillStyle=INK; g.strokeStyle=TICK;
     var NT=Wd<520?3:5; for(var k=0;k<=NT;k++){ var t=a+(b-a)*k/NT, x=X(t); g.beginPath(); g.moveTo(x,yB+hB); g.lineTo(x,yB+hB+5); g.stroke(); g.textAlign=k===0?'left':k===NT?'right':'center'; g.fillText(cosFmt(t),x,yB+hB+7); }
@@ -8883,6 +8897,60 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
     box.addEventListener('click',function(e){ if(e.target.classList.contains('skip')||i>=0) finish(); });
     show(0);
   }
+})();
+
+/* v77 — 토글 대비·슬라이딩, 우주 시대 막대를 머리말에 붙이기, 지질 머리 줄 정렬, 밤 달 보정, 검색창 늘 펼침+가로 스크롤 안내 */
+(function(){
+  var en=LANG==='en';
+  var CUR='width:10px!important;margin-left:-5px!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,transparent 0,color-mix(in srgb,var(--panel-solid,#14181b) 45%,transparent) 36%,var(--nowC,#fff) 40%,var(--nowC,#fff) 60%,color-mix(in srgb,var(--panel-solid,#14181b) 45%,transparent) 64%,transparent 100%)!important';
+  var st=document.createElement('style'); st.id='v77ui';
+  st.textContent=[
+    /* 켜진 토글: 다크는 또렷하게, 라이트는 살짝 덜 밝게 */
+    ':root{--segOn:#f8f5ee}',
+    '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--segOn:#58544e}}:root[data-theme="dark"]{--segOn:#58544e}',
+    '.seg.slide{position:relative}.seg.slide>.pill2{position:absolute;top:2px;bottom:2px;left:0;width:0;border-radius:8px;background:var(--segOn);transition:transform .32s cubic-bezier(.3,.7,.2,1),width .32s cubic-bezier(.3,.7,.2,1);pointer-events:none;z-index:0}',
+    '.seg.slide>button{position:relative;z-index:1}.seg.slide>button[aria-pressed="true"]{background:transparent!important}',
+    /* 우주 시대: 막대 묶음을 머리말 연장으로 */
+    'body.cosmo #top{border-bottom:0!important;border-radius:0!important}',
+    '#cosRows{top:0!important;left:0!important;right:0!important;border-radius:0 0 14px 14px!important;background:var(--panel)!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:0 10px 24px rgba(0,0,0,.18)!important;padding:2px 16px 10px!important;gap:5px!important}',
+    '#cosRows .lbl{display:none!important}',
+    '#cosLinIn .band{font-size:0!important}',
+    '#cosLinIn em{top:0!important;bottom:0!important;display:flex;align-items:center;transform:translateX(-50%)!important;font-size:10px!important;opacity:.85!important}',
+    '#cosLinIn em::after{content:"";position:absolute;left:50%;bottom:0;width:1px;height:5px;background:currentColor;opacity:.6}',
+    '#cosAbsIn .cursor,#cosLinIn .cursor{'+CUR+'}',
+    '#cosmo .cosCard{max-height:calc(100% - 190px)!important}',
+    /* 지질 시대: 입력칸·언어·테마 오른쪽, 누대/대/기/세/절 이름 떼기 */
+    '#timeInput{margin-left:auto!important}',
+    '#chrono .crow>span{display:none!important}#chrono .crow{grid-template-columns:1fr!important}',
+    /* 검색창: 늘 펼침, 설명 카드와 같은 폭, 안내는 가로로 굴러가는 띠 */
+    '#searchWrap{width:min(410px,calc(100% - 88px))!important}',
+    '#searchBox{position:relative}#searchBox .sLbl{display:none!important}',
+    '#searchBox .sHint{position:absolute;left:36px;right:12px;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;color:var(--ink-2);font-size:14px;cursor:text;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent)}',
+    '#searchBox .sHint::-webkit-scrollbar{display:none}#searchBox .sHint span{padding:0 22px 0 6px}',
+    '#searchBox.typed .sHint{display:none}',
+    /* 스크롤바 전체: 양 끝 화살표 없애기 */
+    '::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important}'
+  ].join('\n'); document.head.appendChild(st);
+
+  /* 일반 토글(.seg[role=group])도 켜짐 면이 미끄러져 옮겨지게 — 머리말 시대 토글은 원래 방식 유지 */
+  function slide(seg){ if(seg.__sl||seg.closest('#top')) return; seg.__sl=1; seg.classList.add('slide'); var p=document.createElement('span'); p.className='pill2'; seg.insertBefore(p,seg.firstChild);
+    function place(anim){ var b=seg.querySelector('button[aria-pressed="true"]'); if(!b){ p.style.width='0'; return; } if(!anim){ p.style.transition='none'; } p.style.width=b.offsetWidth+'px'; p.style.transform='translateX('+b.offsetLeft+'px)'; if(!anim){ void p.offsetWidth; p.style.transition=''; } }
+    new MutationObserver(function(){ place(true); }).observe(seg,{attributes:true,subtree:true,attributeFilter:['aria-pressed']});
+    if(window.ResizeObserver) new ResizeObserver(function(){ place(false); }).observe(seg); place(false); }
+  function scan(){ document.querySelectorAll('.seg[role=group]').forEach(slide); }
+  scan(); setInterval(function(){ scan(); var qq=document.getElementById('q'); if(qq&&qq.placeholder) qq.placeholder=''; },1500);
+
+  /* 밤의 지평선 달: 실제보다 어둡던 것 보정 */
+  setInterval(function(){ try{ if(typeof moonU!=='undefined'&&moonU.gN) moonU.gN.value=(typeof GROUND!=='undefined'&&GROUND.on)?Math.max(0,1-moonU.gA.value):0; }catch(e){} },300);
+
+  /* 검색 안내 띠 */
+  var box=$('#searchBox'), q=$('#q');
+  if(box&&q){ var h=document.createElement('div'); h.className='sHint';
+    h.innerHTML='<span>'+(en?'Stars, places, countries, people, events… (e.g. Mars, Rome, Kant, Inca, Mongols, Goryeo, Cold War)':'천체·지명·국가·인명·사건 등 (예: 금성, 로마, 공자, 칸트, 잉카, 몽골, 고려, 냉전)')+'</span>';
+    box.appendChild(h); q.setAttribute('placeholder','');
+    h.addEventListener('wheel',function(e){ var d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY; if(h.scrollWidth>h.clientWidth){ e.preventDefault(); h.scrollLeft+=d; } },{passive:false});
+    h.addEventListener('pointerup',function(){ q.focus(); });
+    function upd(){ box.classList.toggle('typed',q.value!==''); } q.addEventListener('input',upd); upd(); }
 })();
 
 /* ================= 얕은 물 파동 물리(충돌 장면) =================
@@ -9145,4 +9213,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=cbb8009e54"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=62ec2f0e04"); });</script></body></html>
