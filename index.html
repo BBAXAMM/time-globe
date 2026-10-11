@@ -666,6 +666,8 @@ function rulerEN(name,pol){ var bare=/^[가-힣]{2,3}$/.test(name);
 var canvas=$('#gl'), ovc=$('#ov'), ov=ovc.getContext('2d');
 var LITE=(function(){ try{ return matchMedia('(pointer:coarse)').matches||Math.min(screen.width,screen.height)<700||/lite=1/.test(location.search); }catch(e){ return false; } })();
 var renderer;
+/* v72 직전 실행이 켜진 지 20초 안에 죽었으면(휴대폰 메모리 부족 '앗, 이런!') 이번엔 안전 모드: 가벼운 그림 + 화면 배율 1 */
+var SAFE=false; try{ if(localStorage.getItem('tg_boot')==='1'){ SAFE=true; LITE=true; } localStorage.setItem('tg_boot','1'); setTimeout(function(){ try{ localStorage.removeItem('tg_boot'); }catch(e){} },20000); }catch(e){}
 /* v71 휴대폰에서 'Error creating WebGL context' — 조건을 하나씩 낮춰 가며 다시 시도(안티앨리어싱·고성능 요청·WebGL2 순으로 내려놓음) */
 (function(){
   var tries=[{antialias:!LITE,powerPreference:LITE?'low-power':'default'},
@@ -691,7 +693,7 @@ var renderer;
   throw new Error('webgl');
 })();
 var MAXTEX=renderer.capabilities.maxTextureSize||4096; if(MAXTEX<8192) LITE=LITE||MAXTEX<4096;
-renderer.setPixelRatio(Math.min(DPR,LITE?1.4:1.75));
+renderer.setPixelRatio(SAFE?1:Math.min(DPR,LITE?1.4:1.75));
 canvas.addEventListener('webglcontextlost',function(e){ e.preventDefault(); window.__fail('그래픽 메모리가 부족해서 3D가 꺼졌어. 새로고침하면 가벼운 모드로 다시 열 수 있어.'); try{ sessionStorage.setItem('tg_lite','1'); }catch(_){} });
 try{ if(sessionStorage.getItem('tg_lite')) LITE=true; }catch(_){}
 renderer.setClearColor(0x04070a,1);
@@ -6553,7 +6555,7 @@ function glbEyes(o,e){ var sm=null; o.traverse(function(m){ if(m.isSkinnedMesh&&
   fs=fs.slice(0,i0)+NEW+'\n gl_FragColor=vec4(c*sh*bright+add*bright,1.0); }';
   globeMat.fragmentShader=fs; globeMat.needsUpdate=true;
   var pt=precessionTick; precessionTick=function(dt){ U.uT.value+=dt; U.uRel.value=opt.relief==null?1:+opt.relief; var r=pt(dt); var ma=curMa(); U.molt.value=S.mode==='geo'&&ma>4000?Math.min(1,(ma-4000)/300):0;
-    var pres=S.mode==='hist'||ma<0.5; if(pres&&U.tE.value===blankTex){ U.tE.value=tex('elev4k','tex/elev4k.jpg'); U.tW.value=tex('water4k','tex/water4k.jpg'); }
+    var pres=S.mode==='hist'||ma<0.5; if(pres&&U.tE.value===blankTex){ U.tE.value=LITE?tex('elev2k','tex/elev2k.jpg'):tex('elev4k','tex/elev4k.jpg'); U.tW.value=LITE?tex('water2k','tex/water2k.jpg'):tex('water4k','tex/water4k.jpg'); }
     U.useE.value=pres&&U.tW.value!==blankTex&&U.tW.value.image?1:0;
     return r||U.molt.value>0.01||camera.position.length()<1.35; };
 })();
@@ -8588,4 +8590,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=f5b35f0c83"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=363b902e8d"); });</script></body></html>
