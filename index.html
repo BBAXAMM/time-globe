@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#04070a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="시간 지구본"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><style>html,body{margin:0;height:100%;overscroll-behavior:none;background:#04070a}</style></head><body><title>시간 지구본</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#04070a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="시간 지구본"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="favicon-32.png" sizes="32x32"><link rel="icon" href="icon-192.png" sizes="192x192"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.jpg"><link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.jpg"><link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.jpg"><link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.jpg"><link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.jpg"><link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.jpg"><link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.jpg"><link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.jpg"><style>html,body{margin:0;height:100%;overscroll-behavior:none;background:#04070a}</style></head><body><title>시간 지구본</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
@@ -318,7 +318,7 @@ body.ui-off #gHud{transform:translate(-50%,-140%);opacity:0;pointer-events:none}
 #moonView .mvBtns{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:6px 0}#moonView .step{border-color:rgba(255,255,255,.18);color:#e8eaec}
 #mvScrub{width:120px;height:30px;border:1px solid rgba(255,255,255,.18);border-radius:8px;cursor:ew-resize;touch-action:none;background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 1px,transparent 1px 6px),repeating-linear-gradient(90deg,rgba(255,210,122,.9) 0 2px,transparent 2px 48px);background-size:6px 40%,48px 70%;background-repeat:repeat-x;background-position:0 100%,0 100%;align-self:center}
 #moonView .note{font-size:11px;color:#8e979d;margin-top:6px}
-#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:var(--space);font-size:14px;color:#9fb0b3}
+#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:#030514 url(splash.jpg) center 56%/cover no-repeat;font-size:14px;color:#9fb0b3}#loading .ldBox{position:absolute;left:0;right:0;top:72%;text-align:center}#loading .ldT{font-size:clamp(26px,8vw,40px);font-weight:700;color:#ecf2f0;letter-spacing:.02em}#loading .ldS{margin-top:4px;font-size:13px;color:#96afac}#loading .ldM{margin-top:18px;font-size:12px;color:#7f9794}@media (orientation:landscape){#loading{background-image:none}#loading::before{content:'';position:absolute;inset:0;background:url(splash.jpg) center/auto 100% no-repeat;-webkit-mask-image:linear-gradient(90deg,transparent calc(50% - 23vh),#000 calc(50% - 13vh),#000 calc(50% + 13vh),transparent calc(50% + 23vh));mask-image:linear-gradient(90deg,transparent calc(50% - 23vh),#000 calc(50% - 13vh),#000 calc(50% + 13vh),transparent calc(50% + 23vh))}}#loading>div:not(.ldBox){background:rgba(5,8,15,.82);border-radius:14px}
 @media (max-width:400px){ #timeInput{display:none} }
 @media (max-width:640px){
   #cosmo .cosCard{max-height:42vh;padding:10px 12px}
@@ -338,7 +338,7 @@ body.ui-off #gHud{transform:translate(-50%,-140%);opacity:0;pointer-events:none}
 @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
 </style>
 
-<div id="sizer" aria-hidden="true"></div><div id="loading">지구를 불러오는 중…</div>
+<div id="sizer" aria-hidden="true"></div><div id="loading"><div class="ldBox"><div class="ldT">시간 지구본</div><div class="ldS">빅뱅부터 오늘까지</div><div class="ldM" id="ldMsg">지구를 불러오는 중…</div></div></div>
 <div id="stage"><div id="tone" aria-hidden="true"></div><canvas id="gl" aria-label="지구본. 드래그로 회전, 휠·핀치로 확대, 탭하면 그 자리의 정보"></canvas><canvas id="ov"></canvas></div>
 <div id="tip" hidden></div>
 
@@ -666,8 +666,30 @@ function rulerEN(name,pol){ var bare=/^[가-힣]{2,3}$/.test(name);
 var canvas=$('#gl'), ovc=$('#ov'), ov=ovc.getContext('2d');
 var LITE=(function(){ try{ return matchMedia('(pointer:coarse)').matches||Math.min(screen.width,screen.height)<700||/lite=1/.test(location.search); }catch(e){ return false; } })();
 var renderer;
-try{ renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:!LITE,alpha:false,powerPreference:LITE?'low-power':'default'}); }
-catch(e){ window.__fail('이 기기·브라우저에서 3D(WebGL)를 켤 수 없어. ('+e.message+')'); throw e; }
+/* v71 휴대폰에서 'Error creating WebGL context' — 조건을 하나씩 낮춰 가며 다시 시도(안티앨리어싱·고성능 요청·WebGL2 순으로 내려놓음) */
+(function(){
+  var tries=[{antialias:!LITE,powerPreference:LITE?'low-power':'default'},
+             {antialias:false,powerPreference:'low-power'},
+             {antialias:false,powerPreference:'default',failIfMajorPerformanceCaveat:false,stencil:false,precision:'mediump'}];
+  var errs=[];
+  function fresh(){ var c=canvas.cloneNode(false); canvas.parentNode.replaceChild(c,canvas); canvas=c; }
+  for(var i=0;i<tries.length&&!renderer;i++){
+    try{ if(i) fresh(); var o=tries[i]; o.canvas=canvas; o.alpha=false; renderer=new THREE.WebGLRenderer(o); }catch(e){ errs.push(e.message); }
+  }
+  if(!renderer){   /* WebGL1을 직접 집어서 넘겨 봄 */
+    try{ fresh(); var at={antialias:false,alpha:false,depth:true,stencil:false,powerPreference:'low-power',failIfMajorPerformanceCaveat:false};
+      var gl=canvas.getContext('webgl',at)||canvas.getContext('experimental-webgl',at);
+      if(gl) renderer=new THREE.WebGLRenderer({canvas:canvas,context:gl,antialias:false,alpha:false}); else errs.push('webgl1 null');
+    }catch(e){ errs.push(e.message); }
+  }
+  if(renderer){ if(errs.length){ LITE=true; console.warn('WebGL 낮춘 조건으로 켬:',errs); } return; }
+  var ua=navigator.userAgent, inapp=/KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|; wv\)/i.test(ua);
+  var probe=document.createElement('canvas'), has=['webgl2','webgl','experimental-webgl'].filter(function(t){ try{ return !!probe.getContext(t); }catch(e){ return false; } });
+  var tip=inapp?'카톡·네이버 같은 앱 안의 브라우저로 열린 것 같아. 오른쪽 위 ⋮(또는 공유) → "다른 브라우저로 열기"로 크롬·사파리에서 열어 줘.'
+     :'크롬이면 주소창에 chrome://flags 를 열어 "Override software rendering list"를 Enabled로 바꾸거나, 다른 탭을 닫고 다시 열어 줘. 삼성 인터넷이면 크롬으로 열어 봐.';
+  window.__fail('이 브라우저에서 3D(WebGL)를 켤 수 없어. '+tip+' [진단: '+(has.join('/')||'WebGL 없음')+' · '+(inapp?'앱 내 브라우저':'일반 브라우저')+' · '+errs.length+'회 시도 · '+ua.replace(/^Mozilla\/5\.0 /,'').slice(0,90)+']');
+  throw new Error('webgl');
+})();
 var MAXTEX=renderer.capabilities.maxTextureSize||4096; if(MAXTEX<8192) LITE=LITE||MAXTEX<4096;
 renderer.setPixelRatio(Math.min(DPR,LITE?1.4:1.75));
 canvas.addEventListener('webglcontextlost',function(e){ e.preventDefault(); window.__fail('그래픽 메모리가 부족해서 3D가 꺼졌어. 새로고침하면 가벼운 모드로 다시 열 수 있어.'); try{ sessionStorage.setItem('tg_lite','1'); }catch(_){} });
@@ -8547,7 +8569,7 @@ document.addEventListener('pointerdown',function(e){ if(!e.target.closest('#sear
 window.addEventListener('resize',layout);
 
 /* ---------- 시작 ---------- */
-var bootN=0, bootT=9; function bootTick(n){ bootN++; window.__stage='자료 '+bootN+'/'+bootT+' ('+n+')'; var l=$('#loading'); if(l&&!l.querySelector('div')) l.textContent='지구를 불러오는 중… '+Math.round(bootN/bootT*100)+'%'; }
+var bootN=0, bootT=9; function bootTick(n){ bootN++; window.__stage='자료 '+bootN+'/'+bootT+' ('+n+')'; var l=document.getElementById('ldMsg'); if(l) l.textContent=(LANG==='en'?'Loading the globe… ':'지구를 불러오는 중… ')+Math.round(bootN/bootT*100)+'%'; }
 window.__stage='자료 요청';
 Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(function(n){ return getJSON('data/'+n+'.json').then(function(d){ bootTick(n); return d; }); }).concat([getJSON('data/events.json').catch(function(){return []}),getJSON('data/polinfo.json').catch(function(){return {}})]))
 .then(function(r){
@@ -8566,4 +8588,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=adb2a69a92"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=f5b35f0c83"); });</script></body></html>
