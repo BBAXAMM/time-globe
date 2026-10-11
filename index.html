@@ -2429,7 +2429,7 @@ addEventListener('keyup',function(e){ if(!GROUND.on) return; if((e.key==='ArrowU
 /* ================= 상태·설정 ================= */
 var S={mode:store('tg_mode')||'hist', year:1200, ma:66, fc:null, snap:null, sel:null, playing:false, speed:1, dir:1};
 (function(){ var y=parseInt(store('tg_year'),10); if(!isNaN(y)) S.year=y; var m=parseFloat(store('tg_ma')); if(!isNaN(m)) S.ma=m; })();
-var OPT_DEF={padS:1,pinchS:1,selC:'rust',relief:1,fills:true,borders:true,labels:true,cities:true,hist:true,geo:true,rivers:true,coast:true,grid:false,koppen:false,currents:false,winds:false,
+var OPT_DEF={padS:1,pinchS:1,selC:'jade',relief:1,fills:true,borders:true,labels:true,cities:true,hist:true,geo:true,rivers:true,coast:true,grid:false,koppen:false,currents:false,winds:false,
   exag:false,light:true,bright:1,events:true,humans:true,stars:true,mw:true,con:'iau',conNames:'hover',starNames:true,moon:true,bw:1.5,bb:0.12,bo:0.8,conW:1.6,starS:1,skyB:1.2,skyAux:false,conArt:false,dso:true,dsoS:3,lang:'ko',mwB:1,artB:1,viewB:1,viewC:1,viewS:1,warm:0,cardMin:false,sfx:true,bgm:false,vol:0.6,sunMode:'real',night:0.55,bodyS:1,dragS:1,clouds:true,freeMode:false,zodiac:false,orbits:false,sci:true,landmarks:true,craft:true,coastClip:true,bgmBass:true,bgmPerc:true,bgmMel:true,solarNight:0.05,sym3d:true,evCulture:true,clickCenter:true,a3dSep:false,evOff:'',evRegion:'',solarSky:1,meteors:true,solarBoost:false};
 var opt={}; (function(){ var s={}; try{ s=JSON.parse(store('tg_opt')||'{}'); }catch(e){} Object.keys(OPT_DEF).forEach(function(k){ opt[k]=(k in s)?s[k]:OPT_DEF[k]; }); })();
 function saveOpt(){ store('tg_opt',JSON.stringify(opt)); }
@@ -2798,7 +2798,7 @@ function drawOverlay(){
   }
   // 사건 라벨
   var ei=[]; evVisible.forEach(function(e){ var m=evAnchor(e); var v=ll2v(m[0],m[1],1); if(!frontOf(v)) return; var q=scr(v); ei.push({x:q[0],y:q[1],e:e}); }); pinSpread(ei.filter(function(o){ return o.e.pin; }),20); ei.forEach(function(o){ if(o.px==null){ o.px=o.x; o.py=o.y; } });
-  ei.forEach(function(o){ var e=o.e, s=[o.px,o.py]; pinLeader(o); if(e.pin) drawPin(ov,s[0],s[1],e.cat,S.sel&&S.sel.e===e); var ok=label((e.pin&&e.cat==='battle'?'⚔ ':'')+e.ko,s[0],s[1]-(e.pin?15:11),F.ev,EV_COL[e.cat]||'#ffb454'); hoverPts.push({x:s[0],y:s[1],t:{type:'event',e:e},name:e.ko}); });
+  var LVL=evDetailLevel(); ei.forEach(function(o){ var e=o.e, s=[o.px,o.py]; if(evTier(e)>LVL&&!(S.sel&&S.sel.e===e)){ ov.beginPath(); ov.arc(s[0],s[1],2.4,0,7); ov.fillStyle=EV_COL[e.cat]||'#ffb454'; ov.globalAlpha=.75; ov.fill(); ov.globalAlpha=1; hoverPts.push({x:s[0],y:s[1],t:{type:'event',e:e},name:e.ko}); return; } pinLeader(o); if(e.pin) drawPin(ov,s[0],s[1],e.cat,S.sel&&S.sel.e===e); var ok=label((e.pin&&e.cat==='battle'?'⚔ ':'')+e.ko,s[0],s[1]-(e.pin?15:11),F.ev,EV_COL[e.cat]||'#ffb454'); hoverPts.push({x:s[0],y:s[1],t:{type:'event',e:e},name:e.ko}); });
   humanVisible.forEach(function(m){ var p=m[4][Math.floor(m[4].length/2)]; var v=ll2v(p[0],p[1],1); if(!frontOf(v)) return; var s=scr(v); label(m[1],s[0],s[1]-11,F.ev,'#ffe38a'); });
   humanSites.forEach(function(o){ var v=ll2v(o.s[1],o.s[2],1); if(!frontOf(v)) return; var s=scr(v); ov.beginPath(); ov.moveTo(s[0],s[1]-6); ov.lineTo(s[0]+5,s[1]); ov.lineTo(s[0],s[1]+6); ov.lineTo(s[0]-5,s[1]); ov.closePath(); ov.fillStyle='#ffe38a'; ov.fill();
     label(o.h[1]+' · '+o.s[0],s[0]+8,s[1],F.hist,'#ffe9a8','left'); hoverPts.push({x:s[0],y:s[1],t:{type:'hominin',h:o.h,site:o.s},name:o.h[1]}); });
@@ -8139,9 +8139,9 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
    켜진 단추뿐 아니라 강조색(--accent: 표시 설정 항목 제목·슬라이더·설명창 링크·지금 시점 표시)까지 함께 바뀌어. */
 (function(){
   /* v68: 색상환을 OKLCH 기준 36°씩 고르게 나누고, 밝기·채도를 맞춰 살짝 탁하게(노랑 계열만 밝기를 조금 올려 같은 밝기로 보이게) */
-  var L=[['berry','#c25e79','딸기','Berry'],['vermil','#c06d4d','다홍','Vermilion'],['persim','#b68532','홍시','Persimmon'],['yuzu','#99a045','유자','Yuzu'],['sprout','#4f995f','연두','Sprout'],
-         ['jade','#029b8f','비취','Jade'],['aqua','#0495b6','물빛','Aqua'],['sky','#5787cb','하늘','Sky'],['indigo','#8978c5','쪽빛','Indigo'],['mulb','#ac6ca8','오디','Mulberry']];
-  var OLD={rust:'vermil',amber:'persim',reed:'yuzu',lime:'sprout',moss:'sprout',teal:'jade',violet:'mulb',plum:'berry'};
+  var L=[['berry','#ca5556','딸기','Berry'],['persim','#bd6706','홍시','Persimmon'],['yuzu','#ad9006','유자','Yuzu'],['sprout','#73a434','연두','Sprout'],['pine','#0d976f','솔잎','Pine'],
+         ['jade','#01929a','비취','Jade'],['sky','#0e89c4','하늘','Sky'],['indigo','#6676d8','쪽빛','Indigo'],['mulb','#9c63c2','오디','Mulberry'],['plum','#bd5693','자두','Plum']];
+  var OLD={rust:'berry',vermil:'berry',amber:'persim',reed:'yuzu',lime:'sprout',moss:'pine',teal:'jade',aqua:'sky',violet:'mulb'};   /* v74: 딸기를 더 붉게(OKLCH 22°) 잡고 거기서 36°씩 다시 나눔 */
   try{ if(OLD[opt.selC]) opt.selC=OLD[opt.selC]; L.forEach(function(x){ I18N[x[2]]=x[3]; }); }catch(e){}
   if(typeof SELC_LIST!=='undefined'){ SELC_LIST.length=0; L.forEach(function(x){ SELC_LIST.push(x); }); }
   try{ if(!opt.selC||!L.some(function(x){ return x[0]===opt.selC; })) opt.selC='jade'; if(typeof applySelC==='function') applySelC(); }catch(e){}
@@ -8160,7 +8160,7 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
     /* 강조색 고르기 칸: 동그라미 10개를 두 줄로 */
     '[data-seg="selC"]{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%!important;box-sizing:border-box}','[data-seg="selC"] button{min-width:0!important;padding:4px 2px!important;white-space:nowrap;overflow:hidden;text-overflow:clip;font-size:11.5px;justify-content:center}',
     /* 지금 시점 막대: 강조색 가는 선 + 양옆으로 테마 바탕색 그림자가 번지게(같은 색 네온 아님) */
-    '#bar .cursor{width:18px!important;margin-left:-9px!important;border-radius:0!important;box-shadow:none!important;filter:none!important;background:linear-gradient(90deg,transparent 0,color-mix(in srgb,var(--panel-solid,#14181b) 55%,transparent) 30%,var(--panel-solid,#14181b) 43%,var(--nowC) 45%,var(--nowC) 55%,var(--panel-solid,#14181b) 57%,color-mix(in srgb,var(--panel-solid,#14181b) 55%,transparent) 70%,transparent 100%)!important}'
+    '#bar .cursor{width:10px!important;margin-left:-5px!important;border-radius:0!important;box-shadow:none!important;filter:none!important;background:linear-gradient(90deg,transparent 0,color-mix(in srgb,var(--panel-solid,#14181b) 45%,transparent) 36%,var(--nowC) 40%,var(--nowC) 60%,color-mix(in srgb,var(--panel-solid,#14181b) 45%,transparent) 64%,transparent 100%)!important}'
   ].join('');
   document.head.appendChild(st);
 })();
@@ -8242,7 +8242,7 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
       if(shift){ void strip.offsetWidth; strip.classList.add('anim'); strip.style.transform='translateY('+base+'px)'; } }
     /* v73 드럼 폭 = 목록에서 가장 긴 글자 폭 + 좌우 6px — 기호(−/+, ◀/▶)와 드럼 사이가 휑하지 않게 */
     var fitKey='', mc=document.createElement('canvas').getContext('2d');
-    function fit(L){ var k=L.map(function(t){ return t[0]; }).join('|'); if(k===fitKey) return; fitKey=k; mc.font='700 12.5px '+getComputedStyle(el).fontFamily; var mx=0; L.forEach(function(t){ mx=Math.max(mx,mc.measureText(t[0]).width); }); el.style.flex='none'; el.style.width=Math.ceil(mx+12)+'px'; }
+    function fit(L){ var k=L.map(function(t){ return t[0]; }).join('|'); if(k===fitKey) return; fitKey=k; mc.font='700 12.5px '+getComputedStyle(el).fontFamily; var mx=0; L.forEach(function(t){ mx=Math.max(mx,mc.measureText(t[0]).width); }); el.style.flex='none'; el.style.width=Math.ceil(mx+6)+'px'; }
     function step(d){ var n=items().length; if(!n) return; set(((get()+d)%n+n)%n); render(d); }
     var acc=0; el.addEventListener('wheel',function(e){ e.preventDefault(); acc+=(Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX); var th=e.deltaMode?1:40; while(Math.abs(acc)>=th){ step(acc>0?1:-1); acc-=th*(acc>0?1:-1); } },{passive:false});
     var down=null, moved=false; el.addEventListener('pointerdown',function(e){ down={y:e.clientY,a:0}; moved=false; el.setPointerCapture(e.pointerId); });
@@ -8334,6 +8334,41 @@ function applySelC(){ var c=SELC_LIST.filter(function(x){ return x[0]===opt.selC
 
   (function(){ var iv=setInterval(function(){ if(window.__tg){ __tg.TPLAY=P; __tg.timePlay=play; __tg.leap=leap; __tg.curF=curF; clearInterval(iv); } },500); })();
 })();
+
+/* ================= v74 =================
+   ① 주제 칩: 전쟁+전투를 하나로(전투는 전쟁의 한 장면), 순서는 영향 범주 — 생존·물자(전쟁·이동·탐험·교역·경제) → 지식·기술(기술·과학·의학·교육)
+      → 제도·사회(정치·문명) → 정신·문화(사상·종교·예술·체육) → 자연(재해). 색도 그 순서대로 색상환을 한 바퀴(OKLCH 같은 밝기·채도).
+   ② 라이트 테마에선 시대 띠를 밝은 톤으로  ③ 재생 단추 기호 2/3 크기, 도약·재생 상자 폭 같게  ④ 계보·연표 자료를 따로 불러 해상도 높임 */
+(function(){
+  var CH={"order": ["war", "migration", "voyage", "trade", "econ", "tech", "science", "med", "edu", "politics", "civ", "philo", "religion", "art", "sport", "disaster"], "col": {"war": "#ffa098", "migration": "#fea578", "voyage": "#f4ad59", "trade": "#ddba50", "econ": "#bec65d", "tech": "#99d079", "science": "#6ed79c", "med": "#42d9bf", "edu": "#28d6e0", "politics": "#45cffa", "civ": "#82c5fe", "philo": "#a1bcfe", "religion": "#bbb3fe", "art": "#d9a5fb", "sport": "#f09de2", "disaster": "#c8c2bd", "battle": "#ffa098"}};
+  try{ Object.keys(CH.col).forEach(function(k){ EV_COL[k]=CH.col[k]; }); EV_ORDER.length=0; CH.order.forEach(function(c){ EV_ORDER.push(c); });
+    EV_CAT.war='전쟁'; EV_CAT.civ='문명'; EV_CAT.philo='사상'; I18N['전쟁']='War'; I18N['문명']='Civilization'; I18N['사상']='Thought'; }catch(e){}
+  /* 전투는 '전쟁' 칩을 따라 켜고 꺼 */
+  if(typeof evPass==='function'){ var ep=evPass; evPass=function(e){ if(e.cat==='battle'){ var off=evOffList(); if(off.indexOf('war')>=0) return false; if(opt.evRegion==='ea'&&!evInEA(e)) return false; return true; } return ep(e); }; }
+  try{ var off=evOffList().filter(function(c){ return c!=='battle'; }); opt.evOff=off.join(','); }catch(e){}
+  var st=document.createElement('style');
+  var LT='{box-shadow:inset 0 0 0 999px rgba(255,255,255,.46)!important;color:#1d2a2e!important}';
+  st.textContent=[
+    'html:root[data-theme="light"] #bar .band'+LT,'html:root[data-theme="light"] #chrono .u'+LT,
+    '@media (prefers-color-scheme:light){html:root:not([data-theme="dark"]) #bar .band'+LT+'html:root:not([data-theme="dark"]) #chrono .u'+LT+'}',
+    '#tCtl #plRev,#tCtl #plFwd{font-size:9.5px!important}'
+  ].join('');
+  document.head.appendChild(st);
+  /* 도약·재생 상자 폭을 같게(둘 중 넓은 쪽에 맞춤) */
+  function eq(){ var a=document.getElementById('leapBox'), b=document.getElementById('playBox'); if(!a||!b) return; a.style.minWidth=b.style.minWidth=''; var w=Math.max(a.offsetWidth,b.offsetWidth); a.style.minWidth=b.style.minWidth=w+'px'; }
+  setTimeout(eq,200); if(window.MutationObserver){ ['lpDrum','plDrum'].forEach(function(id){ var d=document.getElementById(id); if(d) new MutationObserver(function(){ setTimeout(eq,0); }).observe(d,{attributes:true,attributeFilter:['style']}); }); }
+  try{ evChipsRender(); }catch(e){}
+  /* 계보·연표: data/lineage.json(분야별 사람·사건 약 900개)으로 바꿔 끼움 */
+  fetch('data/lineage.json').then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j||typeof LIN_SETS==='undefined') return; Object.keys(j).forEach(function(k){ LIN_SETS[k]=j[k]; }); }).catch(function(){});
+})();
+/* v74 중요도 층: 멀리서 보면 핵심 전환점(1층)만 이름까지, 다가갈수록 주요(2층) → 세부(3층)가 이름을 얻어. 숨은 것도 작은 점으로 남아 누르면 열려. */
+function evTier(e){ if(e.fx==='milestone') return 1; if(e.__t) return e.__t;
+  var c=e.cat, t=3;
+  if(/^(war|politics|civ|migration|voyage|religion|trade|econ)$/.test(c)) t=2;
+  if(c==='disaster'&&(e.fx==='volcano'||e.fx==='quake'||e.fx==='tsunami')) t=2;
+  if(e.paths&&e.paths.length&&c!=='battle') t=Math.min(t,2);
+  e.__t=t; return t; }
+function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.evDetail==='all') return 3; return d>3.9?1:d>2.6?2:3; }
 
 /* ================= 얕은 물 파동 물리(충돌 장면) =================
    물 높이 η와 흐름 U(동서)·V(남북)를 엇갈린 격자에 두고 얕은 물 방정식으로 시간마다 풀어:
@@ -8595,4 +8630,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=1339dc26ff"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=ef5a0b0d5f"); });</script></body></html>
