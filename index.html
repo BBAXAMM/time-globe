@@ -3221,7 +3221,8 @@ function resItem(it){
   else { var xr=extraResItem(it); t=xr[0]; en=xr[1]; sub=xr[2]; }
   return '<button class="res" data-k="'+k+'"><span><b>'+esc(t)+'</b><br><span class="en">'+esc(en)+'</span></span><span class="sub">'+esc(sub)+'</span></button>';
 }
-function choose(it){
+function choose(it){ try{ choose0(it); }catch(e){ console.error('choose',e&&e.message,e&&e.stack); } }
+function choose0(it){
   $('#results').hidden=true; $('#q').blur(); if(!it) return;
   if(it.t==='pol'){ if(S.mode!=='hist') setMode('hist'); selectPolity(it.en); }
   else if(it.t==='dyn'){ if(S.mode!=='hist') setMode('hist'); var ys=(INDEX.names[it.en]||{y:[]}).y.map(function(v){return v[0]}).filter(function(v){ return v>=it.a&&v<=it.b; }); var yy=ys.length?ys[Math.floor(ys.length/2)]:Math.round(it.a+(it.b-it.a)*0.4); if(yy===0) yy=1; setYear(yy); selectPolity(it.en,yy); }
@@ -3238,8 +3239,8 @@ function choose(it){
 function lookAtSky(ra,dec){ var v=cel(ra,dec,1).applyQuaternion(sky.quaternion); var ll=v2ll(v.clone().negate()); // 반대편에서 지구 너머로 보기
   var off=ll2v(ll[1],ll[0],1).applyAxisAngle(new THREE.Vector3(0,1,0),0.42); var l2=v2ll(off); flyTo(l2[1],l2[0],5.2); }
 var qT=0;
-$('#q').addEventListener('input',function(){ clearTimeout(qT); var v=this.value; qT=setTimeout(function(){ resList=[]; renderResults(v); },120); });
-$('#q').addEventListener('focus',function(){ if(this.value.trim()){ resList=[]; renderResults(this.value); } });
+$('#q').addEventListener('input',function(){ clearTimeout(qT); var v=this.value; qT=setTimeout(function(){ if(v===renderResults.last&&!$('#results').hidden) return; renderResults.last=v; resList=[]; renderResults(v); },120); });
+$('#q').addEventListener('focus',function(){ if(this.value.trim()&&$('#results').hidden){ resList=[]; renderResults(this.value); } });
 $('#q').addEventListener('keydown',function(e){
   var items=[].slice.call($('#results').querySelectorAll('.res'));
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); if(!items.length) return; kbd=(kbd+(e.key==='ArrowDown'?1:-1)+items.length)%items.length; items.forEach(function(x,i){x.classList.toggle('kbd',i===kbd)}); items[kbd].scrollIntoView({block:'nearest'}); }
@@ -8430,13 +8431,13 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     '#linBox .lg{display:block!important}#linBox .lgTop{display:flex;position:sticky;top:0;z-index:3}#linBox .lgRow{display:flex}',
     '#linBox .lgC{flex:none;width:'+LW+'px;height:'+AH+'px}#linBox .lgT{position:static!important;flex:none}',
     '#linBox .lgL{flex:none;position:sticky!important;left:0;width:'+LW+'px}#linBox .lgM{flex:none}',
-    '#linBox .linScroll{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink,#fff) 24%,transparent) transparent}',
+    '#linBox .linScroll{scrollbar-width:auto!important;scrollbar-color:auto!important}',
     '#linBox .linScroll::-webkit-scrollbar{width:0;height:8px}#linBox .linScroll::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink,#fff) 22%,transparent);border-radius:8px;border:0}#linBox .linScroll::-webkit-scrollbar-track{background:transparent}',
-    '#linBox .linMini{position:absolute!important;right:3px;top:4px;bottom:12px;width:12px!important;border-radius:6px;background:color-mix(in srgb,var(--ink,#fff) 6%,transparent)!important;opacity:.85;z-index:5}',
+    '#linBox .linMini{position:absolute!important;right:3px;top:'+(AH+4)+'px;bottom:12px;width:12px!important;border-radius:6px;background:color-mix(in srgb,var(--ink,#fff) 6%,transparent)!important;opacity:.85;z-index:5}',
     '#linBox .linMini i{left:3px!important;right:3px!important;opacity:.5!important}',
-    '#linBox .fdL,#linBox .fdR{position:absolute;top:0;bottom:8px;width:22px;pointer-events:none;z-index:4}',
+    '#linBox .fdL,#linBox .fdR{position:absolute;top:'+AH+'px;bottom:8px;width:22px;pointer-events:none;z-index:4}',
     '#linBox .fdL{left:'+LW+'px;background:linear-gradient(90deg,color-mix(in srgb,var(--panel-solid,#1e1f21) 92%,transparent),transparent)}',
-    '#linBox .fdR{right:0;background:linear-gradient(270deg,color-mix(in srgb,var(--panel-solid,#1e1f21) 92%,transparent),transparent)}',
+    '#linBox .fdR{right:18px;background:linear-gradient(270deg,color-mix(in srgb,var(--panel-solid,#1e1f21) 92%,transparent),transparent)}',
     '#linBox .linMini{flex:none;width:16px;position:relative;cursor:pointer;background:color-mix(in srgb,var(--ink,#fff) 4%,transparent)}',
     '#linBox .linMini i{position:absolute;left:3px;right:3px;border-radius:2px;opacity:.55}',
     '#linBox .linMini b{position:absolute;left:0;right:0;border-radius:3px;background:color-mix(in srgb,var(--ink,#fff) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink,#fff) 35%,transparent);pointer-events:none}',
@@ -8491,10 +8492,10 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
       G.querySelectorAll('.ln').forEach(function(g){ g.onclick=function(){ pick(g.dataset.id); }; });
       G.querySelector('.lgT').addEventListener('wheel',onWheel,{passive:false});
       if(cur) hi(lineage(cur),cur); miniDraw(); }
-    function miniDraw(){ var fl=d.querySelector('.fdL'); if(fl){ fl.style.top=AH+'px'; } var H=mini.clientHeight||1, tot=Hd+AH, k=H/tot, h=''; LIN_T.forEach(function(t,i){ h+='<i style="top:'+((laneY[i]+AH)*k)+'px;height:'+Math.max(2,(laneY[i+1]-laneY[i]-3)*k)+'px;background:'+t[2]+'"></i>'; });
-      h+='<b style="top:'+(sc.scrollTop*k)+'px;height:'+Math.max(6,Math.min(H,sc.clientHeight*k))+'px"></b>'; mini.innerHTML=h; }
+    function miniDraw(){ var fl=d.querySelector('.fdL'); if(fl){ fl.style.top=AH+'px'; } var H=mini.clientHeight||1, tot=Hd, k=H/tot, h=''; LIN_T.forEach(function(t,i){ h+='<i style="top:'+((laneY[i])*k)+'px;height:'+Math.max(2,(laneY[i+1]-laneY[i]-3)*k)+'px;background:'+t[2]+'"></i>'; });
+      h+='<b style="top:'+(sc.scrollTop*k)+'px;height:'+Math.max(6,Math.min(H,(sc.clientHeight-AH-8)*k))+'px"></b>'; mini.innerHTML=h; }
     sc.addEventListener('scroll',miniDraw,{passive:true});
-    function miniGo(e){ var r=mini.getBoundingClientRect(), f=(e.clientY-r.top)/r.height; sc.scrollTop=f*(Hd+AH)-sc.clientHeight/2; }
+    function miniGo(e){ var r=mini.getBoundingClientRect(), f=(e.clientY-r.top)/r.height; sc.scrollTop=f*Hd-(sc.clientHeight-AH)/2; }
     var md=false; mini.addEventListener('pointerdown',function(e){ md=true; mini.setPointerCapture(e.pointerId); miniGo(e); }); mini.addEventListener('pointermove',function(e){ if(md) miniGo(e); }); mini.addEventListener('pointerup',function(){ md=false; });
     var raf=0;
     function onWheel(e){ e.preventDefault(); var r=sc.getBoundingClientRect(), mx=e.clientX-r.left-LW+sc.scrollLeft, yr=Yinv(mx), dy=e.deltaY||e.deltaX;
@@ -8754,7 +8755,8 @@ function evDetailLevel(){ var d=(typeof cam!=='undefined'&&cam.dist)||4; if(opt.
     var INK=Lt?'rgba(42,38,34,.85)':'rgba(225,228,235,.85)', TICK=Lt?'rgba(42,38,34,.4)':'rgba(200,210,230,.5)', MAIN=Lt?'#b7791f':'#ffd27a', SUB=Lt?'#1f7fae':'#7fd6ff', CUR=Lt?'#2a2622':'#fff';
     function X(t){ return 8+(Wd-16)*(t-a)/(b-a); }
     var yB=43, hB=14;
-    COS_BAND.forEach(function(bd){ if(bd[1]<a||bd[0]>b) return; var x0=Math.max(8,X(bd[0])), x1=Math.min(Wd-8,X(bd[1])); g.fillStyle=bd[4]; g.globalAlpha=Lt?0.35:0.55; g.fillRect(x0,yB,x1-x0,hB); g.globalAlpha=1; });
+    COS_BAND.forEach(function(bd){ if(bd[1]<a||bd[0]>b) return; var x0=Math.max(0,X(bd[0])), x1=Math.min(Wd,X(bd[1])); g.fillStyle=bd[4]; g.globalAlpha=Lt?0.35:0.55; g.fillRect(x0,yB,x1-x0,hB); g.globalAlpha=1; });
+    g.fillStyle=Lt?'rgba(60,50,40,.07)':'rgba(235,230,222,.07)'; var e0=X(COS_T0), e1=X(COS_T1); if(e0>0) g.fillRect(0,yB,e0,hB); if(e1<Wd) g.fillRect(e1,yB,Wd-e1,hB);
     g.font='10.5px system-ui,sans-serif'; g.textBaseline='top'; g.fillStyle=INK; g.strokeStyle=TICK;
     var NT=Wd<520?3:5; for(var k=0;k<=NT;k++){ var t=a+(b-a)*k/NT, x=X(t); g.beginPath(); g.moveTo(x,yB+hB); g.lineTo(x,yB+hB+5); g.stroke(); g.textAlign=k===0?'left':k===NT?'right':'center'; g.fillText(cosFmt(t),x,yB+hB+7); }
     var marks=[]; COS.forEach(function(r){ if(r[0]>=a-1e-9&&r[0]<=b+1e-9) marks.push([r[0],E?r[2]:r[1],1]); }); COS_SUB.forEach(function(s){ if(s[0]>=a&&s[0]<=b) marks.push([s[0],E?s[2]:s[1],0]); });
@@ -8861,41 +8863,126 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
   tick();
 })();
 
-/* v76 첫 로딩 인트로(주마등) 플레이어
-   intro/manifest.json 이 있을 때만 켜진다: {"scenes":[{"img":"intro/01.webp","t":"우주의 탄생","en":"Birth of the universe","dur":2.6,"kb":[1.12,1,"50% 50%"]}...]}
-   - 장면마다 켄 번스(천천히 다가가거나 물러남) + 0.7초 겹침 전환
-   - 처음 방문 때만 자동 재생(다시 보기는 ?intro=1), 아무 데나 누르거나 '건너뛰기'로 넘김
-   - 끝나면 마지막 장면(지구)이 작아지며 실제 지구본으로 줌아웃 */
+/* v78 첫 로딩 인트로 — '시네마틱 주마등'
+   intro/manifest.json 의 그림을 한 캔버스 위에서 움직여 이어 붙인다(자막 없음).
+   - 장면마다 카메라 워크(밀고 들어가기·빠지기·좌우 팬·위아래 틸트) + 장면에 맞는 입자(별·불티·먼지·눈·물방울·빛줄기)
+   - 장면 사이는 매치컷: 가운데 빛으로 '줌 스루', 섬광 컷, 휙 넘기기(휩 팬), 겹침
+   - 음악: intro/music.mp3 가 있으면 그것을, 없으면 Web Audio로 만든 웅장한 현·북·금관 느낌의 곡을 페이드 인. 장면별 효과음.
+     브라우저는 손대기 전 소리를 막으므로 '🔊 소리 켜기'(또는 화면 아무 데나 누르기)로 켠다. 건너뛰기는 단추로만.
+   - 세로 화면: 그림을 화면 가득(커버) 채우고, 세로일 때는 좌우 팬을 더 길게 해 넓은 그림을 훑는다.
+   - 처음 방문 때만 자동 재생(다시 보기 ?intro=1). 끝은 제목 → 실제 지구본 줌아웃. */
 (function(){
   var q=location.search, force=/[?&]intro=1/.test(q); var seen=false; try{ seen=localStorage.getItem('tg_intro')==='1'; }catch(e){}
   if(/[?&]intro=0/.test(q)||(seen&&!force)||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches&&!force)) return;
   fetch('intro/manifest.json',{cache:'no-cache'}).then(function(r){ return r.ok?r.json():null; }).then(function(M){ if(M&&M.scenes&&M.scenes.length) run(M); }).catch(function(){});
+
+  /* 장면 연출표: 번호 → [카메라, 입자, 효과음, 다음 장면으로의 전환, 길이(초)] */
+  var D={'01':['out','stars','boom','zoom',1.5],'02':['in','stars','whoosh','zoom',.6],'03':['in','stars','whoosh','zoom',.6],'04':['in','dust','whoosh','zoom',.65],'05':['in','sparks','impact','flash',.8],
+    '06':['panR','embers','rumble','whip',.6],'07':['up','bubbles','water','fade',.6],'08':['panL','bubbles','water','whip',.55],'09':['panR','dust','roar','flash',.6],'10':['in','embers','impact','flash',.8],
+    '11':['out','dust','wind','fade',.55],'12':['in','rays','wind','zoom',.75],'13':['panR','rays','step','whip',.5],'14':['in','sparks','hit','flash',.5],'15':['in','embers','fire','fade',.6],
+    '16':['out','embers','fire','whip',.55],'17':['panR','snow','wind','whip',.55],'18':['panL','embers','fire','flash',.55],'19':['panR','dust','wind','fade',.5],'20':['panL','snow','wind','whip',.55],
+    '21':['panR','dust','wind','fade',.5],'22':['out','dust','crowd','whip',.55],'23':['in','sparks','hit','flash',.55],'24':['panR','dust','drums','whip',.6],'25':['up','rays','choir','fade',.55],
+    '26':['panL','spray','water','whip',.6],'27':['panR','embers','train','whip',.55],'28':['in','dust','click','flash',.55],'29':['panL','none','beeps','whip',.5],'30':['up','sparks','rocket','zoom',.8],
+    '31':['out','stars','whoosh','zoom',.6],'32':['up','lights','pop','flash',.6],'33':['in','none','home','zoom',1.1],'34':['in','lights','crowd','flash',1.1],'35':['out','none','laugh','end',2.1]};
   function run(M){ var en=LANG==='en';
     var st=document.createElement('style'); st.textContent=[
-      '#intro{position:fixed;inset:0;z-index:200;background:#000;overflow:hidden;cursor:pointer;transition:opacity .9s ease}',
-      '#intro .sc{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity .7s ease;will-change:transform,opacity}',
-      '#intro .sc.on{opacity:1}',
-      '#intro .cap{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 54px);text-align:center;color:#fff;font:600 clamp(16px,2.6vw,26px) "Gowun Batang",Georgia,serif;text-shadow:0 2px 14px rgba(0,0,0,.7);opacity:0;transition:opacity .25s ease;pointer-events:none;padding:0 16px}',
-      '#intro .cap.on{opacity:.95}',
-      '#intro .skip{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);border:0;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}',
-      '#intro .bar{position:absolute;left:0;bottom:0;height:2px;background:rgba(255,255,255,.55);width:0}',
-      '#intro.out{opacity:0;pointer-events:none}'].join(''); document.head.appendChild(st);
-    var box=document.createElement('div'); box.id='intro'; box.innerHTML='<div class="cap"></div><button class="skip">'+(en?'Skip ›':'건너뛰기 ›')+'</button><div class="bar"></div>'; document.body.appendChild(box);
-    var cap=box.querySelector('.cap'), bar=box.querySelector('.bar'), S2=M.scenes, els=[], total=0;
-    S2.forEach(function(s){ var d=document.createElement('div'); d.className='sc'; d.style.backgroundImage='url("'+s.img+'")'; box.insertBefore(d,cap); els.push(d); total+=(s.dur||2.6); var im=new Image(); im.src=s.img; });
-    var i=-1, t0=performance.now(), done=false, timer=0;
-    function show(k){ if(done) return; if(k>=S2.length){ finish(); return; } var s=S2[k], d=els[k], kb=s.kb||[1.1,1,'50% 50%'];
-      d.style.transformOrigin=kb[2]||'50% 50%'; d.style.transition='none'; d.style.transform='scale('+kb[0]+')'; void d.offsetWidth;
-      var fd=s.fade||Math.min(0.5,(s.dur||2.6)*0.55); d.style.transition='opacity '+fd+'s ease, transform '+((s.dur||2.6)+fd+0.2)+'s linear'; d.style.transform='scale('+kb[1]+')'; d.classList.add('on'); if(k>0){ var pv=els[k-1]; setTimeout(function(){ pv.classList.remove('on'); },fd*1000+30); }
-      var tx=en?(s.en||s.t||''):(s.t||''); cap.textContent=tx; cap.classList.toggle('on',!!tx);
-      i=k; timer=setTimeout(function(){ show(k+1); },(s.dur||2.6)*1000); }
-    (function prog(){ if(done) return; bar.style.width=Math.min(100,(performance.now()-t0)/(total*10))+'%'; requestAnimationFrame(prog); })();
-    function finish(){ if(done) return; done=true; clearTimeout(timer); try{ localStorage.setItem('tg_intro','1'); }catch(e){}
-      var go=function(){ try{ if(typeof cam!=='undefined'&&typeof animTo==='function'){ var d0=cam.dist; cam.dist=Math.max(1.12,d0*0.42); if(typeof updateCam==='function') updateCam(); animTo(null,null,d0,2200); } }catch(e){}
-        var last=els[i]; if(last){ last.style.transition='opacity .9s ease, transform 1.4s cubic-bezier(.5,0,.2,1)'; last.style.transform='scale(.35)'; } box.classList.add('out'); setTimeout(function(){ box.remove(); },1000); };
-      if(window.__booted) go(); else { cap.textContent=en?'Loading the Earth…':'지구를 불러오는 중…'; cap.classList.add('on'); var w=setInterval(function(){ if(window.__booted){ clearInterval(w); go(); } },200); } }
-    box.addEventListener('click',function(e){ if(e.target.classList.contains('skip')||i>=0) finish(); });
-    show(0);
+      '#intro{position:fixed;inset:0;z-index:200;background:#000;overflow:hidden;transition:opacity .9s ease}#intro.out{opacity:0;pointer-events:none}',
+      '#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}',
+      '#intro .ib{position:absolute;border:0;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}',
+      '#intro .skip{right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px)}#intro .snd{right:16px;top:calc(env(safe-area-inset-top,0px) + 16px)}#intro .snd.on{opacity:.55}',
+      '#intro .bar{position:absolute;left:0;bottom:0;height:2px;background:rgba(255,255,255,.5);width:0}'].join(''); document.head.appendChild(st);
+    var box=document.createElement('div'); box.id='intro'; box.innerHTML='<canvas></canvas><button class="ib snd">'+(en?'🔊 Sound on':'🔊 소리 켜기')+'</button><button class="ib skip">'+(en?'Skip ›':'건너뛰기 ›')+'</button><div class="bar"></div>'; document.body.appendChild(box);
+    var cv=box.querySelector('canvas'), g=cv.getContext('2d'), bar=box.querySelector('.bar'), sndB=box.querySelector('.snd');
+    var SC=M.scenes.map(function(s){ var n=(s.img.match(/(\d\d)\.\w+$/)||[])[1]||'', d=D[n]||['in','none','whoosh','fade',.55]; var im=new Image(); im.src=s.img; return {n:n,img:im,mv:s.mv||d[0],fx:s.fx||d[1],sfx:s.sfx||d[2],tr:s.tr||d[3],dur:s.dur&&s.dur>1.2&&!D[n]?s.dur:d[4]}; });
+    var T=[], acc=0; SC.forEach(function(s){ T.push(acc); acc+=s.dur; }); var TITLE=1.7, TOTAL=acc+TITLE, TR=0.3;
+    var W=0,H=0,DPR=Math.min(2,devicePixelRatio||1); function fit(){ W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; g.setTransform(DPR,0,0,DPR,0,0); } fit(); addEventListener('resize',fit);
+    var portrait=function(){ return H>W*1.05; };
+    /* 그림 그리기: 커버 맞춤 + 카메라(배율 s, 이동 dx,dy는 화면 비율) */
+    function drawImg(im,s,dx,dy,alpha,blurX){ if(!im.complete||!im.naturalWidth||alpha<=0) return; var iw=im.naturalWidth, ih=im.naturalHeight, k=Math.max(W/iw,H/ih)*s, w=iw*k, h=ih*k, x=(W-w)/2+dx*W, y=(H-h)/2+dy*H;
+      g.globalAlpha=alpha; if(blurX){ for(var j=-3;j<=3;j++){ g.globalAlpha=alpha/7*1.6; g.drawImage(im,x+j*blurX,y,w,h); } } else g.drawImage(im,x,y,w,h); g.globalAlpha=1; }
+    function cam(s,u){ var P=portrait(), pan=P?0.22:0.06; switch(s.mv){ case 'in': return [1.06+0.14*u,0,0]; case 'out': return [1.22-0.16*u,0,0]; case 'panL': return [1.14,pan*(0.5-u),0]; case 'panR': return [1.14,pan*(u-0.5),0]; case 'up': return [1.14,0,0.05*(0.5-u)]; case 'down': return [1.14,0,0.05*(u-0.5)]; } return [1.1,0,0]; }
+    /* 입자 */
+    var parts=[]; function seed(fx){ parts=[]; var n={stars:90,embers:46,dust:40,snow:70,bubbles:34,sparks:40,rays:6,spray:50,lights:40}[fx]||0; for(var i=0;i<n;i++) parts.push({x:Math.random(),y:Math.random(),v:0.3+Math.random(),r:Math.random(),p:Math.random()*6.28}); }
+    function drawFx(fx,u,a){ if(!a) return; g.save(); g.globalCompositeOperation='lighter'; parts.forEach(function(p){ var x=p.x*W, y=p.y*H, t=u;
+      if(fx==='stars'){ var z=1+t*1.4*p.v, cx=W/2+(x-W/2)*z, cy=H/2+(y-H/2)*z; g.fillStyle='rgba(255,250,235,'+(0.5*a*p.r)+')'; g.fillRect(cx,cy,1.4+p.r*1.6,1.4+p.r*1.6); }
+      else if(fx==='embers'||fx==='sparks'){ var yy=(y-t*H*0.45*p.v+H)%H, xx=x+Math.sin(p.p+t*6)*14; g.fillStyle=fx==='sparks'?'rgba(255,230,170,'+(0.75*a*p.r)+')':'rgba(255,150,60,'+(0.6*a*p.r)+')'; g.beginPath(); g.arc(xx,yy,1+p.r*2.2,0,6.3); g.fill(); }
+      else if(fx==='dust'){ g.fillStyle='rgba(255,240,210,'+(0.18*a*p.r)+')'; g.beginPath(); g.arc((x+t*40*p.v)%W,(y+Math.sin(p.p+t*3)*8),1+p.r*2.5,0,6.3); g.fill(); }
+      else if(fx==='snow'){ g.fillStyle='rgba(255,255,255,'+(0.5*a*p.r)+')'; g.beginPath(); g.arc((x+t*60)%W,(y+t*H*0.35*p.v)%H,1+p.r*2,0,6.3); g.fill(); }
+      else if(fx==='bubbles'){ g.strokeStyle='rgba(200,240,255,'+(0.4*a*p.r)+')'; g.beginPath(); g.arc(x+Math.sin(p.p+t*5)*6,(y-t*H*0.3*p.v+H)%H,2+p.r*4,0,6.3); g.stroke(); }
+      else if(fx==='spray'){ g.fillStyle='rgba(230,245,255,'+(0.35*a*p.r)+')'; g.fillRect((x-t*120*p.v+W)%W,(y*0.6+H*0.4),2,1); }
+      else if(fx==='lights'){ var b=0.5+0.5*Math.sin(p.p+t*10); g.fillStyle='hsla('+Math.round(p.r*360)+',90%,70%,'+(0.35*a*b)+')'; g.beginPath(); g.arc(x,y*0.7,2+p.r*3,0,6.3); g.fill(); }
+      else if(fx==='rays'){ var gr=g.createLinearGradient(W*0.5,0,W*(0.2+p.r*0.6),H); gr.addColorStop(0,'rgba(255,230,180,'+(0.08*a)+')'); gr.addColorStop(1,'rgba(255,230,180,0)'); g.fillStyle=gr; g.beginPath(); g.moveTo(W*0.5-20,0); g.lineTo(W*0.5+20,0); g.lineTo(W*(0.25+p.r*0.6)+60,H); g.lineTo(W*(0.25+p.r*0.6)-60,H); g.fill(); } });
+      g.restore(); }
+    function vignette(){ var r=g.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75); r.addColorStop(0,'rgba(0,0,0,0)'); r.addColorStop(1,'rgba(0,0,0,.55)'); g.fillStyle=r; g.fillRect(0,0,W,H); }
+    /* ---------- 소리 ---------- */
+    var AC=null, master=null, music=null, audioOn=false, mp3=null;
+    function noise(c,sec){ var b=c.createBuffer(1,Math.max(1,c.sampleRate*sec),c.sampleRate), d=b.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=Math.random()*2-1; var s=c.createBufferSource(); s.buffer=b; return s; }
+    function env(gn,t,a,h,r,peak){ gn.gain.setValueAtTime(0.0001,t); gn.gain.exponentialRampToValueAtTime(peak,t+a); gn.gain.setValueAtTime(peak,t+a+h); gn.gain.exponentialRampToValueAtTime(0.0001,t+a+h+r); }
+    function tone(type,f,t,a,h,r,peak,dest,f2){ var o=AC.createOscillator(), gn=AC.createGain(); o.type=type; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+a+h+r); env(gn,t,a,h,r,peak); o.connect(gn); gn.connect(dest||master); o.start(t); o.stop(t+a+h+r+0.05); }
+    function nz(t,sec,type,f,peak,q,f2){ var s=noise(AC,sec), fl=AC.createBiquadFilter(), gn=AC.createGain(); fl.type=type; fl.frequency.setValueAtTime(f,t); if(f2) fl.frequency.exponentialRampToValueAtTime(f2,t+sec); fl.Q.value=q||0.7; env(gn,t,Math.min(.05,sec*.2),sec*.3,sec*.5,peak); s.connect(fl); fl.connect(gn); gn.connect(master); s.start(t); }
+    function sfx(kind,t){ if(!AC) return; switch(kind){
+      case 'boom': tone('sine',90,t,.01,.2,2.2,.9,master,28); nz(t,2.5,'lowpass',900,.5,.7,80); break;
+      case 'impact': tone('sine',70,t,.01,.15,1.4,.8,master,30); nz(t,1.2,'lowpass',2500,.45,.6,120); break;
+      case 'whoosh': nz(t,.55,'bandpass',400,.25,1.2,3500); break;
+      case 'rumble': nz(t,1,'lowpass',160,.4,.7,60); break;
+      case 'water': nz(t,.9,'bandpass',900,.12,.5,500); break;
+      case 'roar': tone('sawtooth',80,t,.08,.25,.5,.12,master,55); nz(t,.7,'bandpass',300,.15,2); break;
+      case 'wind': nz(t,1,'bandpass',700,.12,.6,1200); break;
+      case 'step': nz(t,.08,'lowpass',300,.3); nz(t+.25,.08,'lowpass',300,.3); break;
+      case 'hit': nz(t,.15,'highpass',1800,.35); tone('triangle',420,t,.002,.04,.2,.2); break;
+      case 'fire': for(var i=0;i<10;i++) nz(t+Math.random()*.6,.04,'highpass',2500,.12); nz(t,.8,'lowpass',500,.12); break;
+      case 'crowd': nz(t,1,'bandpass',1400,.18,.4); break;
+      case 'drums': [0,.15,.3].forEach(function(d){ tone('sine',110,t+d,.005,.05,.35,.6,master,45); }); break;
+      case 'choir': [293.7,370,440].forEach(function(f){ tone('sine',f,t,.15,.25,.5,.07); }); break;
+      case 'train': nz(t,.7,'bandpass',220,.25,3); tone('square',300,t,.02,.2,.2,.03); break;
+      case 'click': for(var k=0;k<6;k++) nz(t+k*.08,.02,'highpass',3000,.2); break;
+      case 'beeps': [880,1320,990,1760].forEach(function(f,j){ tone('square',f,t+j*.09,.003,.04,.03,.04); }); break;
+      case 'rocket': nz(t,1.4,'lowpass',400,.55,.7,120); tone('sine',60,t,.1,.6,.6,.3); break;
+      case 'pop': [0,.1,.2].forEach(function(d){ tone('sine',900+d*2000,t+d,.003,.02,.08,.12); }); break;
+      case 'home': tone('sine',523,t,.02,.1,.6,.05); tone('sine',659,t+.12,.02,.1,.6,.05); break;
+      case 'laugh': [0,.14,.28].forEach(function(d){ tone('triangle',520-d*200,t+d,.01,.05,.1,.05); }); break; } }
+    /* 만든 곡: D단조 — 저음 지속음 + 현 화음(4초마다) + 점점 세지는 8분음 반복 + 큰 북, 끝에 금관 화음과 심벌 */
+    function startMusic(t0,offset){ var G=AC.createGain(); G.gain.setValueAtTime(0.0001,t0); G.gain.exponentialRampToValueAtTime(0.9,t0+3.5); G.connect(master); music=G;
+      var lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.setValueAtTime(500,t0); lp.frequency.linearRampToValueAtTime(3200,t0+Math.max(4,TOTAL-offset)); lp.connect(G);
+      var rem=Math.max(2,TOTAL-offset), CH=[[146.8,174.6,220],[116.5,146.8,174.6],[174.6,220,261.6],[130.8,164.8,196]];
+      [73.4,110].forEach(function(f){ [0,1.5].forEach(function(det){ var o=AC.createOscillator(), gn=AC.createGain(); o.type='sawtooth'; o.frequency.value=f+det; gn.gain.value=0.05; o.connect(gn); gn.connect(lp); o.start(t0); o.stop(t0+rem+2); }); });
+      for(var b=0;b*4<rem;b++){ CH[b%4].forEach(function(f){ [-2,2].forEach(function(dt){ var o=AC.createOscillator(), gn=AC.createGain(), tt=t0+b*4; o.type='sawtooth'; o.frequency.value=f*Math.pow(2,dt/1200); env(gn,tt,1.2,1.8,1.2,0.028); o.connect(gn); gn.connect(lp); o.start(tt); o.stop(tt+4.3); }); }); }
+      var step=0.25, n=Math.floor(rem/step); for(var k=0;k<n;k++){ var tt=t0+k*step, I=Math.min(1,k/n*1.6); var ch=CH[Math.floor(k*step/4)%4]; tone('triangle',ch[k%3]*2,tt,.005,.03,.12,0.02+0.05*I,lp); if(k%8===0) tone('sine',65,tt,.005,.08,.5,0.15+0.35*I,G,40); }
+      var tEnd=t0+rem-TITLE+0.05; [146.8,220,293.7,349.2].forEach(function(f){ tone('sawtooth',f,tEnd,.08,1.2,1.4,.06,lp); }); nz(tEnd-1.2,2.6,'highpass',6000,.18,.7,9000); tone('sine',55,tEnd,.01,.3,1.8,.7,G,35); }
+    function audio(){ if(audioOn) return; audioOn=true; sndB.classList.add('on'); sndB.textContent='🔊';
+      try{ AC=new (window.AudioContext||window.webkitAudioContext)(); master=AC.createGain(); master.gain.value=0.8; master.connect(AC.destination); }catch(e){ return; }
+      var off=(performance.now()-tStart)/1000, t0=AC.currentTime+0.05;
+      fetch('intro/music.mp3',{method:'HEAD'}).then(function(r){ if(r.ok){ mp3=new Audio('intro/music.mp3'); mp3.currentTime=Math.min(off,30); mp3.volume=0; mp3.play().catch(function(){}); var v=0, it=setInterval(function(){ v=Math.min(0.9,v+0.06); if(mp3) mp3.volume=v; if(v>=0.9) clearInterval(it); },200); } else startMusic(t0,off); }).catch(function(){ startMusic(t0,off); }); }
+    function fadeAudio(){ try{ if(master&&AC){ master.gain.cancelScheduledValues(AC.currentTime); master.gain.setValueAtTime(master.gain.value,AC.currentTime); master.gain.linearRampToValueAtTime(0.0001,AC.currentTime+1.6); setTimeout(function(){ try{ AC.close(); }catch(e){} },2000); } if(mp3){ var m=mp3, it=setInterval(function(){ m.volume=Math.max(0,m.volume-0.08); if(m.volume<=0){ clearInterval(it); m.pause(); } },120); } }catch(e){} }
+    try{ var probe=new (window.AudioContext||window.webkitAudioContext)(); if(probe.state==='running'){ probe.close(); setTimeout(audio,0); } else probe.close(); }catch(e){}
+    /* ---------- 진행 ---------- */
+    var tStart=performance.now(), done=false, cur=-1;
+    function frame(now){ if(done) return; var t=(now-tStart)/1000; if(t>=TOTAL){ finish(); return; }
+      g.fillStyle='#000'; g.fillRect(0,0,W,H);
+      var k=0; while(k<SC.length-1&&t>=T[k+1]) k++;
+      if(t<acc){ if(k!==cur){ cur=k; seed(SC[k].fx); if(AC) sfx(SC[k].sfx,AC.currentTime+0.01); }
+        var s=SC[k], u=(t-T[k])/s.dur, c=cam(s,u), end=T[k]+s.dur, nx=SC[k+1], into=end-t;
+        if(nx&&into<TR&&s.tr!=='end'){ var w=1-into/TR, cn=cam(nx,0);
+          if(s.tr==='zoom'){ drawImg(s.img,c[0]*(1+w*1.6),c[1],c[2],1-w*0.6); drawImg(nx.img,cn[0]*(0.75+0.25*w),cn[1],cn[2],w); g.fillStyle='rgba(255,250,240,'+(Math.sin(w*Math.PI)*0.55)+')'; g.fillRect(0,0,W,H); }
+          else if(s.tr==='whip'){ var sh=w*w; drawImg(s.img,c[0],c[1]-sh*0.55,c[2],1,sh*28); drawImg(nx.img,cn[0],cn[1]+(1-sh)*0.55,cn[2],sh,(1-sh)*28); }
+          else if(s.tr==='flash'){ drawImg(w<0.5?s.img:nx.img,w<0.5?c[0]*(1+w*0.2):cn[0],w<0.5?c[1]:cn[1],w<0.5?c[2]:cn[2],1); g.fillStyle='rgba(255,255,255,'+(Math.sin(w*Math.PI)*0.9)+')'; g.fillRect(0,0,W,H); }
+          else { drawImg(s.img,c[0],c[1],c[2],1); drawImg(nx.img,cn[0],cn[1],cn[2],w); } }
+        else if(k>0&&t-T[k]<0.02) drawImg(s.img,c[0],c[1],c[2],1);
+        else drawImg(s.img,c[0],c[1],c[2],1);
+        drawFx(s.fx,u,1); vignette(); }
+      else { /* 제목: 빛이 모였다 퍼지며 '시간 지구본' */ var v=(t-acc)/TITLE, last=SC[SC.length-1], c2=cam(last,1); drawImg(last.img,c2[0]*(1+v*0.25),0,0,Math.max(0,1-v*1.6));
+        g.save(); g.globalAlpha=Math.min(1,v*2.2)*(v>0.82?(1-v)/0.18:1); g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='middle'; g.shadowColor='rgba(255,215,150,.9)'; g.shadowBlur=24;
+        g.font='700 '+Math.round(Math.min(W,H)*0.11)+'px "Gowun Batang",Georgia,serif'; g.fillText(en?'Time Globe':'시간 지구본',W/2,H/2); g.shadowBlur=0; g.globalAlpha*=0.8; g.font=Math.round(Math.min(W,H)*0.032)+'px "IBM Plex Sans KR",sans-serif'; g.fillText(en?'From the Big Bang to today':'빅뱅부터 오늘까지',W/2,H/2+Math.min(W,H)*0.1); g.restore(); }
+      bar.style.width=Math.min(100,t/TOTAL*100)+'%'; requestAnimationFrame(frame); }
+    function finish(){ if(done) return; done=true; try{ localStorage.setItem('tg_intro','1'); }catch(e){} fadeAudio();
+      var go=function(){
+        try{ var C=window.__tg&&__tg.cam; if(C&&typeof animTo==='function'){ var d1=C.dist; C.dist=Math.max(1.12,d1*0.42); if(typeof updateCam==='function') updateCam(); animTo(null,null,d1,2400); } }catch(e){}
+        box.classList.add('out'); setTimeout(function(){ box.remove(); },1000); };
+      if(window.__booted) go(); else { var w=setInterval(function(){ if(window.__booted){ clearInterval(w); go(); } },200); } }
+    box.querySelector('.skip').addEventListener('click',function(e){ e.stopPropagation(); finish(); });
+    sndB.addEventListener('click',function(e){ e.stopPropagation(); audio(); });
+    box.addEventListener('pointerdown',function(){ audio(); });
+    requestAnimationFrame(frame);
   }
 })();
 
@@ -8906,7 +8993,7 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
   var st=document.createElement('style'); st.id='v77ui';
   st.textContent=[
     /* 켜진 토글: 다크는 또렷하게, 라이트는 살짝 덜 밝게 */
-    ':root{--segOn:#f8f5ee}',
+    ':root{--segOn:#efeae1}',
     '@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--segOn:#58544e}}:root[data-theme="dark"]{--segOn:#58544e}',
     '.seg.slide{position:relative}.seg.slide>.pill2{position:absolute;top:2px;bottom:2px;left:0;width:0;border-radius:8px;background:var(--segOn);transition:transform .32s cubic-bezier(.3,.7,.2,1),width .32s cubic-bezier(.3,.7,.2,1);pointer-events:none;z-index:0}',
     '.seg.slide>button{position:relative;z-index:1}.seg.slide>button[aria-pressed="true"]{background:transparent!important}',
@@ -8946,11 +9033,380 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
   /* 검색 안내 띠 */
   var box=$('#searchBox'), q=$('#q');
   if(box&&q){ var h=document.createElement('div'); h.className='sHint';
-    h.innerHTML='<span>'+(en?'Stars, places, countries, people, events… (e.g. Mars, Rome, Kant, Inca, Mongols, Goryeo, Cold War)':'천체·지명·국가·인명·사건 등 (예: 금성, 로마, 공자, 칸트, 잉카, 몽골, 고려, 냉전)')+'</span>';
+    h.innerHTML='<span>'+(en?'Constellations, geography, countries, people, events (e.g. Orion, Alps, Rome, Kant, Cold War)':'별자리·지리·국가·인명·사건 등 (예: 오리온, 알프스, 로마, 칸트, 냉전)')+'</span>';
     box.appendChild(h); q.setAttribute('placeholder','');
     h.addEventListener('wheel',function(e){ var d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY; if(h.scrollWidth>h.clientWidth){ e.preventDefault(); h.scrollLeft+=d; } },{passive:false});
     h.addEventListener('pointerup',function(){ q.focus(); });
     function upd(){ box.classList.toggle('typed',q.value!==''); } q.addEventListener('input',upd); upd(); }
+})();
+
+/* v78 — 우주 머리 상자 평평하게·세부 바 폭 맞춤·첫 진입 '지금', 떠 있는 창이 머리말 높이를 바로 따라가기,
+   별자리 3인칭(지구 뒤 멀리서), 일상 무채색, 스크롤바 화살표 없애기, 대표 생물 한 줄, 지평선 밤+구름 달무리 */
+(function(){
+  var st=document.createElement('style'); st.id='v78ui';
+  st.textContent=[
+    /* 우주 시대 막대 묶음: 다른 시대 머리말처럼 평평하게(둥근 모서리·그림자 없음, 아래 가는 선) */
+    '#cosRows{border-radius:0!important;box-shadow:none!important;border-bottom:1px solid var(--hair)!important}',
+    /* 떠 있는 창 위치는 머리말 높이 변수 하나로 */
+    '#searchWrap,#ctl,#layers,#events{top:calc(var(--topH,160px) + 10px)!important}',
+    /* 스크롤바: 표준 속성 대신 웹킷 스타일을 쓰게 해서 양 끝 화살표가 안 생기게(위치·크기는 그대로) */
+    '#card .cardBody,#card,#results,.sheet,#linBox .linInfo,#notes,#cosmo .cosCard{scrollbar-width:auto!important;scrollbar-color:auto!important}',
+    '#card .cardBody::-webkit-scrollbar,#results::-webkit-scrollbar,.sheet::-webkit-scrollbar,#linBox .linInfo::-webkit-scrollbar,#notes::-webkit-scrollbar,#cosmo .cosCard::-webkit-scrollbar{width:6px;height:6px}',
+    '#card .cardBody::-webkit-scrollbar-thumb,#results::-webkit-scrollbar-thumb,.sheet::-webkit-scrollbar-thumb,#linBox .linInfo::-webkit-scrollbar-thumb,#notes::-webkit-scrollbar-thumb,#cosmo .cosCard::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 24%,transparent);border:0!important;border-radius:6px}',
+    '#card .cardBody::-webkit-scrollbar-track,#results::-webkit-scrollbar-track,.sheet::-webkit-scrollbar-track,#linBox .linInfo::-webkit-scrollbar-track,#notes::-webkit-scrollbar-track,#cosmo .cosCard::-webkit-scrollbar-track{background:transparent}',
+    '::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important}',
+    /* 이 시기 대표 생물: 여섯 개가 한 줄에 */
+    '#card .biorow{flex-wrap:nowrap!important;gap:4px!important}',
+    '#card .biorow span{width:auto!important;flex:1 1 0;min-width:0}#card .biorow span svg{width:22px;height:22px}#card .biorow small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}'
+  ].join('\n'); document.head.appendChild(st);
+
+  /* 머리말 높이가 바뀌면 그 즉시 --topH 갱신 */
+  var top=$('#top');
+  function syncTop(){ var h=top.getBoundingClientRect().height; document.documentElement.style.setProperty('--topH',h+'px'); try{ headerH=h; }catch(e){} }
+  if(window.ResizeObserver) new ResizeObserver(syncTop).observe(top);
+  new MutationObserver(syncTop).observe(document.body,{attributes:true,attributeFilter:['class']});
+  syncTop();
+
+  /* 일상: 무채색 */
+  try{ EV_COL.daily='#b3aea6'; if(typeof evChipsRender==='function') evChipsRender(); }catch(e){}
+
+  /* 우주 시대: 세부 바 창을 앞뒤로 조금 넓혀(이전·다음 단계 끝자락) 위 막대들과 폭을 맞춤, 첫 진입은 '지금' */
+  if(typeof cosWin==='function'){ var _w=cosWin; cosWin=function(){ var w=_w(), s=w[1]-w[0]; return [w[0]-s*0.04,w[1]+s*0.04]; }; }
+  if(typeof cosOpen==='function'){ var _o=cosOpen, first=true; cosOpen=function(){ if(first){ first=false; try{ var iN=COS.findIndex(function(x){ return x[1]==='지금'; }); if(iN>=0){ COSMO.t=COS[iN][0]; COSMO.u=iN; } }catch(e){} } return _o.apply(this,arguments); };
+    var mc=$('#mCos'); if(mc) mc.onclick=function(){ if(COSMO.on) cosClose(false); else cosOpen(); }; }
+
+  /* 별자리 찾기: 지구 뒤쪽 멀리(3인칭)에서 지구를 작게 앞에 두고 별자리를 넓게 */
+  if(typeof lookAtSky==='function'){ lookAtSky=function(ra,dec){ var v=cel(ra,dec,1).applyQuaternion(sky.quaternion); var ll=v2ll(v.clone().negate());
+      var off=ll2v(ll[1],ll[0],1).applyAxisAngle(new THREE.Vector3(0,1,0),0.27); var l2=v2ll(off); flyTo(l2[1],l2[0],12); }; }
+
+  /* 지평선 밤 + 구름: 아주 옅은 달무리 */
+  (function(){ if(typeof moon==='undefined') return;
+    var cv=document.createElement('canvas'); cv.width=cv.height=256; var g=cv.getContext('2d');
+    var r=g.createRadialGradient(128,128,10,128,128,128); r.addColorStop(0,'rgba(255,255,250,.55)'); r.addColorStop(0.18,'rgba(235,240,255,.22)'); r.addColorStop(0.55,'rgba(210,220,255,.06)');
+    r.addColorStop(0.78,'rgba(220,225,255,.10)'); r.addColorStop(0.84,'rgba(255,235,215,.07)'); r.addColorStop(1,'rgba(200,210,255,0)'); g.fillStyle=r; g.fillRect(0,0,256,256);
+    var tx=new THREE.CanvasTexture(cv), sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthWrite:false,opacity:0,blending:THREE.AdditiveBlending}));
+    sp.scale.setScalar(0.2727*9); sp.renderOrder=5; moon.add(sp);
+    setInterval(function(){ var on=false; try{ var cb=document.getElementById('gCloud'); on=typeof GROUND!=='undefined'&&GROUND.on&&cb&&cb.getAttribute('aria-pressed')==='true'; }catch(e){}
+      var night=on?Math.max(0,1-(GROUND.day||0)*1.6):0, o=0.55*night; if(Math.abs(sp.material.opacity-o)>0.01){ sp.material.opacity=o; sp.visible=o>0.01; dirty=true; } else sp.visible=o>0.01; },400); })();
+})();
+
+/* ================= v78: '지구·천체 시스템 3D' — 천체 속(6개 탭) 뒤에 지구 시스템 과정 7개 탭을 덧붙여 =================
+   조석(밀물·썰물) · 대기 대류 · 해류 · 공전 궤도 · 자전축 기울기와 계절 · 세차 운동(밀란코비치) · 골딜락스 존
+   모두 교육용 개념도: 크기·거리·두께·빠르기는 보이게 과장했고(과장 정도는 설명에 적어 둠), 수치는 대략값이야. */
+(function(){ if(typeof POP==='undefined'||!POP.inside) return;
+var T78='지구·천체 시스템 3D'; POP.inside.t=T78; try{ addI18N(T78,'Earth & Sky Systems 3D'); }catch(e){}
+(function(){ var b=document.getElementById('insideBtn'); if(!b) return; b.title=T78+' — 지구·달·태양의 속, 지진파, 자기장·오로라, 조석, 대기·해류, 공전·계절·세차, 골딜락스 존'; b.setAttribute('aria-label',T78); })();
+
+/* ---------- 공통 도우미 ---------- */
+var UPV=new THREE.Vector3(0,1,0);
+function geo(lat,lon,r){ return cxGeoDir(lat,lon).multiplyScalar(r); }
+function setLab(L,h){ if(L._h!==h){ L._h=h; L.el.innerHTML=h; L.full=null; L.short=null; } }   /* 바뀌는 이름표: 겹침 정리용 캐시도 비워 */
+function vis(L,on){ L.el.style.opacity=on?1:0; }
+/* 화면 왼쪽 위(머리말 밑)에 고정한 안내 상자 — 장면 속 이름표·설명 창과 겹치지 않게 */
+function pin(L,right){ L.pos=null; L.el.style.cssText=(right?'left:auto;right:16px;':'left:16px;')+'top:calc(var(--cxTopY,var(--topH,110px)) + 58px);transform:none;margin:0;white-space:normal;max-width:min(430px,calc(100vw - 32px));transition:opacity .4s'; L.pinned=right?2:1; return L; }
+/* 머리말이 두 줄로 접히는 좁은 화면에서도 그 밑에 오게: 매 프레임 머리말 아래 끝을 재서 맞춰 */
+if(typeof cosxTick==='function'){ var _ct=cosxTick; cosxTick=function(dt){ var r=_ct.apply(this,arguments); try{ var tb=document.querySelector('#cosx .cxTop'), y=tb?Math.round(tb.getBoundingClientRect().bottom+8):0; if(y>0) COSX.labels.forEach(function(L){ if(L.pinned&&L._y!==y){ L._y=y; L.el.style.top=y+'px'; } }); }catch(e){} return r; }; }
+/* 공 뒤쪽(카메라 반대편)에 있는 이름표는 숨겨 — 지구 중심이 원점일 때 */
+var _w=new THREE.Vector3(); function front(o){ o.getWorldPosition(_w); var c=COSX.cam.position; return _w.dot(c)-_w.lengthSq()>0.35*_w.length(); }
+function earth(r,seg){ return new THREE.Mesh(new THREE.SphereGeometry(r,seg||64,Math.round((seg||64)*0.75)),new THREE.MeshStandardMaterial({map:cxSeaTex(),roughness:0.9,metalness:0})); }
+function slerp(a,b,ang,s){ if(ang<1e-6) return a.clone(); var sa=Math.sin(ang); return a.clone().multiplyScalar(Math.sin((1-s)*ang)/sa).addScaledVector(b,Math.sin(s*ang)/sa); }
+/* 위도·경도 꺾은선 → 구 겉을 따라가는 점들(대원으로 이어) */
+function sphPts(L,r,closed){ var out=[], n=L.length; for(var i=0;i<(closed?n:n-1);i++){ var A=L[i], B=L[(i+1)%n], a=cxGeoDir(A[0],A[1]), b=cxGeoDir(B[0],B[1]), ang=a.angleTo(b), k=Math.max(2,Math.ceil(ang/(3*D2R)));
+    for(var j=0;j<k;j++) out.push(slerp(a,b,ang,j/k).multiplyScalar(r)); }
+  if(!closed) out.push(cxGeoDir(L[n-1][0],L[n-1][1]).multiplyScalar(r)); return out; }
+/* 흐르는 관: 관 위로 밝은 띠가 흐름 방향으로 지나가(맨틀 대류 장면과 같은 방식) */
+var FLV='varying vec2 vU; void main(){ vU=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }';
+var FLF='uniform float uT,uRep,uSp,uOp; uniform vec3 uC; varying vec2 vU; void main(){ float s=smoothstep(0.45,1.0,fract(vU.x*uRep-uT*uSp)); float rim=1.0-abs(vU.y*2.0-1.0); gl_FragColor=vec4(uC*(0.62+0.75*s),(0.38+0.6*s)*(0.55+0.45*rim)*uOp); }';
+function flow(cur,rad,col,uT,o){ o=o||{}; var len=cur.getLength(), dash=o.dash||0.8, segs=o.segs||Math.min(600,Math.max(40,Math.round(len*28)));
+  var m=new THREE.Mesh(new THREE.TubeGeometry(cur,segs,rad,8,!!o.closed),new THREE.ShaderMaterial({uniforms:{uT:uT,uRep:{value:Math.max(1,Math.round(len/dash))},uSp:{value:(o.sp||0.6)/dash},uOp:{value:o.op==null?1:o.op},uC:{value:new THREE.Color(col)}},transparent:true,depthWrite:false,vertexShader:FLV,fragmentShader:FLF}));
+  m.renderOrder=4; return m; }
+function heads(par,cur,n,col,size,v){ var len=cur.getLength(), A=[]; for(var i=0;i<n;i++){ var c=new THREE.Mesh(new THREE.ConeGeometry(size*0.42,size,10),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.95,depthWrite:false})); c.renderOrder=5; par.add(c); A.push({m:c,cur:cur,ph:i/n,sp:v/len}); } return A; }
+function headsTick(A,t,op,closed){ A.forEach(function(a){ var u=(a.ph+t*a.sp)%1; a.m.position.copy(a.cur.getPointAt(u)); a.m.quaternion.setFromUnitVectors(UPV,a.cur.getTangentAt(u)); var k=closed?1:Math.sin(Math.PI*u); a.m.scale.setScalar(Math.max(0.001,Math.min(1,k*1.6))); a.m.material.opacity=0.95*op; a.m.visible=op>0.01; }); }
+function endCone(par,cur,col,size){ var c=new THREE.Mesh(new THREE.ConeGeometry(size*0.45,size,10),new THREE.MeshBasicMaterial({color:col,transparent:true,depthWrite:false})); c.position.copy(cur.getPointAt(1)); c.quaternion.setFromUnitVectors(UPV,cur.getTangentAt(1)); c.renderOrder=5; par.add(c); return c; }
+function arrow(col){ var g=new THREE.Group(), mt=new THREE.MeshBasicMaterial({color:col,transparent:true}); var sh=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,1,8),mt); g.add(sh); var hd=new THREE.Mesh(new THREE.ConeGeometry(0.08,0.22,10),mt); g.add(hd); g.userData={sh:sh,hd:hd,mt:mt};
+  g.set=function(o,d,len){ g.position.copy(o); var n=d.clone().normalize(); g.quaternion.setFromUnitVectors(UPV,n); var L=Math.max(0.05,len-0.22); sh.scale.set(1,L,1); sh.position.y=L/2; hd.position.y=L+0.11; }; return g; }
+function lineLoop(pts,col,op,dash){ var g=new THREE.BufferGeometry().setFromPoints(pts), m=dash?new THREE.LineDashedMaterial({color:col,dashSize:dash,gapSize:dash*0.8,transparent:true,opacity:op==null?1:op}):new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op==null?1:op}); var l=new THREE.LineLoop(g,m); if(dash) l.computeLineDistances(); return l; }
+function circ(r,n,y){ var p=[]; for(var i=0;i<n;i++){ var a=i/n*Math.PI*2; p.push(new THREE.Vector3(Math.cos(a)*r,y||0,-Math.sin(a)*r)); } return p; }
+function sunObj(sc,r,glow){ var b=new THREE.Mesh(new THREE.SphereGeometry(r,48,32),new THREE.MeshBasicMaterial({color:'#ffd27a'})); sc.add(b); var s=cxSprite('#ffb040',r*(glow||7),0.9); b.add(s); var s2=cxSprite('#fff4d0',r*3,0.8); b.add(s2); return b; }
+function md(doy){ var ml=[31,28,31,30,31,30,31,31,30,31,30,31], d=((doy%365.25)+365.25)%365.25, m=0; while(m<11&&d>=ml[m]){ d-=ml[m]; m++; } return (m+1)+'월 '+Math.min(ml[m],Math.floor(d)+1)+'일'; }
+function hm(h){ var H=Math.floor(h), M=Math.round((h-H)*60); if(M===60){ H++; M=0; } return H+'시간 '+(M<10?'0':'')+M+'분'; }
+
+var NEW={};
+
+/* ================= ① 조석(밀물·썰물) ================= */
+NEW.tide=function(sc){ cxStars(sc,1500,300); cxLights(sc); var R=2;
+  var E=earth(R); sc.add(E);
+  /* 바닷물 껍질: 평형 조석 모양 h = A달·P2(cosθ달) + A해·P2(cosθ해) — 달(해) 쪽과 그 반대쪽 두 곳이 부풀어 */
+  var U={uM:{value:new THREE.Vector3(1,0,0)},uS:{value:new THREE.Vector3(-1,0,0)},uAm:{value:1},uAs:{value:0},uH:{value:0.62},uB:{value:R+0.14}};
+  var wat=new THREE.Mesh(new THREE.SphereGeometry(1,128,64),new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,
+    vertexShader:'uniform vec3 uM,uS; uniform float uAm,uAs,uH,uB; varying float vH; varying vec3 vN,vW; void main(){ vec3 n=normalize(position); float cm=dot(n,uM), cs=dot(n,uS); float h=uAm*(1.5*cm*cm-0.5)+uAs*(1.5*cs*cs-0.5); vH=h; vec4 w=modelMatrix*vec4(n*(uB+uH*h),1.0); vW=w.xyz; vN=n; gl_Position=projectionMatrix*viewMatrix*w; }',
+    fragmentShader:'varying float vH; varying vec3 vN,vW; void main(){ float k=smoothstep(-0.7,1.2,vH); vec3 v=normalize(cameraPosition-vW); float f=1.0-abs(dot(vN,v)); vec3 c=mix(vec3(0.05,0.2,0.5),vec3(0.45,0.92,1.0),k); gl_FragColor=vec4(c*(0.85+0.5*f),0.16+0.34*k+0.3*pow(f,2.0)); }'}));
+  wat.renderOrder=3; sc.add(wat);
+  var Mo=new THREE.Mesh(new THREE.SphereGeometry(0.55,48,32),new THREE.MeshStandardMaterial({map:tex('moon','tex/moon.jpg'),roughness:1})); sc.add(Mo); var DM=9, lMo=cxLab('<b>달</b>',Mo,'pt');
+  var Sun=sunObj(sc,1.4,6); Sun.position.set(-17,0,0); var lSun=cxLab('<b>태양</b><br><small>실제론 달보다 약 400배 멀어</small>',Sun,'pt gold');
+  /* 조석력 화살표: 달이 각 자리를 당기는 힘 − 지구 중심을 당기는 힘 = 3(r̂·m̂)m̂ − r̂ (늘이는 쪽·누르는 쪽) */
+  var AR=[]; for(var i=0;i<16;i++){ var a=arrow('#ffffff'); sc.add(a); AR.push({g:a,ang:i/16*Math.PI*2}); }
+  var lF=cxLab('조석력: 달 쪽·반대쪽으로 늘이고, 옆에선 눌러',new THREE.Vector3(0,0,-(R+1.9)),'pt');
+  /* 인천 앞바다 표시(지구와 함께 돌아) */
+  var mk=cxBall(0.07,'#ffd76a',1.2); mk.position.copy(geo(37.4,126.4,R*1.01)); E.add(mk); var lMk=cxLab('',mk,'pt gold');
+  var clk=pin(cxLab('',null,'cnt'));
+  var T1=7, T2=16, T3=24, T4=32, rel=24.84, prevH=null, rising=false, highs=[], lastStep=-1;
+  COSX.caps=[[0,'달의 중력은 가까운 쪽 바다를 가장 세게, 지구 한가운데는 그보다 덜, 먼 쪽 바다는 가장 약하게 당겨. 그 차이(조석력, 흰 화살표) 때문에 바다가 달 쪽과 그 반대쪽 두 군데로 부풀어. 물 높이는 보이게 수백만 배 부풀렸어(먼 바다에선 실제로 1 m도 안 돼). 위(북극 쪽)에서 내려다본 모습이야.'],
+    [T1,'지구는 이 두 부풂 밑을 돌아. 그래서 한 곳(노란 점: 인천 앞바다)엔 하루에 밀물·썰물이 두 번씩 와. 달도 같은 쪽으로 공전하니 달이 다시 같은 자리에 오기까지 약 24시간 50분 → 만조와 만조 사이는 약 12시간 25분.'],
+    [T2,'태양도 조석을 만들어 — 훨씬 무겁지만 아주 멀어서 힘은 달의 절반쯤(약 46%). 보름달이나 그믐(삭)처럼 태양·지구·달이 한 줄이면 두 부풂이 겹쳐 밀물·썰물 차이가 가장 커 → 사리(대조).'],
+    [T3,'반달(상현·하현) 때는 달과 태양이 90° 벌어져 서로 깎아 먹어 → 조금(소조), 차이가 가장 작아. 사리와 조금은 약 2주(보름)마다 번갈아 와.'],
+    [T4,'실제 바다는 대륙에 막혀 큰 소용돌이처럼 돌며 출렁여서 곳마다 시각·높이가 달라. 얕고 넓은 서해는 차이가 커서 인천은 사리 때 8 m 안팎이야. 조석 마찰로 지구 자전은 아주 조금씩 느려지고, 달은 해마다 약 3.8 cm씩 멀어져. 달 거리(실제 지구 반지름의 약 60배)와 태양 거리는 아주 가깝게 줄여 그렸어.']];
+  COSX.dur=42; COSX.view={yaw:0,pitch:1.18,dist:13.5,tgt:new THREE.Vector3(2.5,0,0),spin:0};
+  var mW=new THREE.Vector3(), tA=new THREE.Vector3(2.5,0,0), tB=new THREE.Vector3(-4,0,0);
+  function hAt(n,m,s,As){ var cm=n.dot(m), cs=n.dot(s); return (1.5*cm*cm-0.5)+As*(1.5*cs*cs-0.5); }
+  return {tick:function(t,dt){ var H=t*3;   /* 장면 1초 = 3시간 */
+    var ph=(t<T3?0:ss(T3,T3+3,t)*Math.PI/2)+(t<T4?0:ss(T4,T4+3,t)*Math.PI/2);   /* 달 자리: 보름 → 하현(90°) → 그믐(180°) */
+    var m=new THREE.Vector3(Math.cos(ph),0,-Math.sin(ph)); Mo.position.copy(m).multiplyScalar(DM); Mo.rotation.y=ph+Math.PI; U.uM.value.copy(m);
+    var As=0.46*ss(T2,T2+2,t); U.uAs.value=As; Sun.visible=t>T2-0.5; vis(lSun,t>T2);
+    E.rotation.y=-126.4*D2R+2*Math.PI*H/rel;   /* 달에 대한 자전(24시간 50분에 한 바퀴) — 처음엔 인천이 달 쪽 */
+    var k=ss(T2-1,T2+2,t); COSX.view.tgt.lerpVectors(tA,tB,k); COSX.view.dist=13.5+10*k;
+    var fa=1-ss(T1,T1+1.5,t); AR.forEach(function(A){ var r=new THREE.Vector3(Math.cos(A.ang),0,-Math.sin(A.ang)), v=m.clone().multiplyScalar(3*r.dot(m)).sub(r); A.g.set(r.clone().multiplyScalar(R+0.95),v,0.32*v.length()); A.g.userData.mt.opacity=fa; A.g.visible=fa>0.01; }); vis(lF,fa>0.5);
+    mk.getWorldPosition(mW).normalize(); var h=hAt(mW,m,U.uS.value,As), h2=hAt(mW.clone().applyAxisAngle(UPV,2*Math.PI*0.05/rel),m,U.uS.value,As);
+    if(prevH!=null){ if(h>prevH) rising=true; else if(rising&&h<prevH){ rising=false; highs.push(H); } } prevH=h;
+    var state=h2>h?'밀물(물이 들어와) ↑':'썰물(물이 빠져) ↓'; setLab(lMk,'<b>인천 앞바다</b><br><small>'+state+'</small>');
+    var step=t<T1?0:t<T2?1:t<T3?2:t<T4?3:4;
+    if(step!==lastStep){ lastStep=step; highs=highs.slice(-1); }
+    var c='';
+    if(step===1&&highs.length){ c='지난 만조 뒤 '+hm(H-highs[highs.length-1]); if(highs.length>1) c+=' · 만조 간격 '+hm(highs[highs.length-1]-highs[highs.length-2]); }
+    else if(step>=2){ var d=Math.acos(clamp(m.dot(new THREE.Vector3(-1,0,0)),-1,1)), amp=Math.sqrt(1+As*As+2*As*Math.cos(2*d));
+      c=(amp>1.2?'<b style="color:#9fe0ff">사리(대조)</b>':amp<0.8?'<b style="color:#ffd76a">조금(소조)</b>':'')+' 밀물·썰물 차이 ≈ 달만 있을 때의 '+amp.toFixed(2)+'배'; }
+    setLab(clk,c); clk.el.style.opacity=c?1:0;
+    setLab(lMo,'<b>달</b>'+(t>T2?' <small>'+(ph<0.2?'보름달':ph<1.8?'하현(반달)':'그믐(삭)')+'</small>':'')); }};
+};
+
+/* ================= ② 대기 대류(세 순환 고리) ================= */
+NEW.atmo=function(sc){ cxStars(sc,1200,300); cxLights(sc); var R=3.2, H=1.25, uT={value:0};
+  var EG=new THREE.Group(); EG.rotation.y=-100*D2R; sc.add(EG); EG.add(earth(R,96)); cxAtmo(sc,R);   /* 앞쪽에 아프리카·유럽이 오게 */
+  /* 지구 가장자리의 대기 단면(위아래 판): 두께는 약 100배 넘게 부풀림 */
+  var slab=new THREE.Mesh(new THREE.RingGeometry(R,R+H,160,1),new THREE.MeshBasicMaterial({color:'#6fb8ff',transparent:true,opacity:0.1,side:THREE.DoubleSide,depthWrite:false})); sc.add(slab);
+  var tp=[]; for(var i=0;i<=160;i++){ var a=i/160*Math.PI*2; tp.push(new THREE.Vector3(Math.cos(a)*(R+H),Math.sin(a)*(R+H),0)); } sc.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(tp),new THREE.LineBasicMaterial({color:'#9fc8ff',transparent:true,opacity:0.35})));
+  var CELLS=[[0,30,'#ff9a4a',1],[30,60,'#6fdc8c',0],[60,90,'#7fc8ff',1]], loops=[];   /* [위도 a, b, 색, 위쪽 흐름이 극 쪽인가] */
+  CELLS.forEach(function(C,ci){ [1,-1].forEach(function(sg){ [1,-1].forEach(function(sx){ var c=(C[0]+C[1])/2, w=(C[1]-C[0])/2*0.8, r0=R+0.12, rm=r0+(H-0.12)/2, hh=(H-0.12)/2*0.78, P=[];
+    for(var k=0;k<72;k++){ var s=(C[3]?-1:1)*k/72*Math.PI*2, la=(c+w*Math.cos(s))*sg*D2R, rr=rm+hh*Math.sin(s); P.push(new THREE.Vector3(sx*rr*Math.cos(la),rr*Math.sin(la),0)); }
+    var cur=new THREE.CatmullRomCurve3(P,true), m=flow(cur,0.05,C[2],uT,{closed:true,sp:0.45,dash:0.45}); sc.add(m); loops.push({m:m,hd:heads(sc,cur,2,C[2],0.26,0.45),ci:ci}); }); }); });
+  /* 적도 수렴대(ITCZ): 빛나는 띠 + 솟는 구름 */
+  var itcz=new THREE.Mesh(new THREE.SphereGeometry(R*1.006,128,4,0,Math.PI*2,Math.PI/2-5*D2R,10*D2R),new THREE.MeshBasicMaterial({color:'#fff2b0',transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false})); sc.add(itcz);
+  var clouds=[]; for(var q=0;q<14;q++){ var s=cxSprite('#ffffff',0.35,0.7); sc.add(s); clouds.push({s:s,sx:q%2?1:-1,ph:q/14}); }
+  /* 땅 위 바람: [위도, 동쪽 성분, 북쪽 성분(북반구 기준), 색, 이름] */
+  var WB=[[15,-1,-0.55,'#ffd27a','무역풍'],[45,1,0.45,'#9fffb0','편서풍'],[75,-1,-0.45,'#bfe6ff','극동풍']], winds=[], wl=[];
+  WB.forEach(function(B){ [1,-1].forEach(function(sg){ var step=B[0]>60?45:20; for(var lon=-50;lon<=70;lon+=step){ var lat0=sg*B[0], n=B[2]*sg, L=10, P=[];
+      for(var k=0;k<=8;k++){ var s=k/8-0.5; P.push(geo(lat0+n*L*s,lon+B[1]*L*s/Math.cos(lat0*D2R),R*1.012)); }
+      var cur=new THREE.CatmullRomCurve3(P), m=flow(cur,0.034,B[3],uT,{sp:0.5,dash:0.25}); EG.add(m); winds.push({m:m,c:endCone(EG,cur,B[3],0.2)}); }
+    var o=new THREE.Object3D(); o.position.copy(geo(sg*B[0]+(sg>0?4:-4),12,R*1.03)); EG.add(o); wl.push(cxLab('<b>'+B[4]+'</b>',o,'pt')); }); });
+  /* 코리올리: 적도 쪽으로 가는 공기가 북반구에선 오른쪽(서쪽), 남반구에선 왼쪽(서쪽)으로 휘어 — 흰 점선은 지구가 안 돈다면 갈 길 */
+  var cor=[]; [[1,-5],[-1,40]].forEach(function(C){ var P=[], G=[]; for(var k=0;k<=12;k++){ var s=k/12; P.push(geo(C[0]*(32-26*s),C[1]-22*s*s,R*1.02)); G.push(geo(C[0]*(32-26*s),C[1],R*1.02)); }
+    var cur=new THREE.CatmullRomCurve3(P), m=flow(cur,0.04,'#ffffff',uT,{sp:0.6,dash:0.35}); EG.add(m); var gl=new THREE.Line(new THREE.BufferGeometry().setFromPoints(G),new THREE.LineDashedMaterial({color:'#ffffff',dashSize:0.12,gapSize:0.1,transparent:true,opacity:0.6})); gl.computeLineDistances(); EG.add(gl);
+    cor.push({m:m,c:endCone(EG,cur,'#ffffff',0.22),g:gl}); });
+  var oC=new THREE.Object3D(); oC.position.copy(geo(20,-30,R*1.03)); EG.add(oC); var lC=cxLab('<b>코리올리 효과</b><br><small>북반구: 오른쪽으로 · 남반구: 왼쪽으로 휘어</small>',oC,'pt');
+  function lab(h,lat,sx){ var r=R+H+0.35, o=new THREE.Object3D(); o.position.set(sx*r*Math.cos(lat*D2R),r*Math.sin(lat*D2R),0); sc.add(o); return cxLab(h,o,'pt'); }
+  var lH=lab('<b>해들리 순환</b> <small>0~30°</small>',16,1), lFe=lab('<b>페럴 순환</b> <small>30~60°</small>',45,1), lP=lab('<b>극 순환</b> <small>60~90°</small>',74,1), lI=lab('<b>적도 수렴대(ITCZ)</b><br><small>공기가 올라가 — 구름·비</small>',0,1),
+    l30=lab('<b>30° 고압대</b><br><small>공기가 내려와 메말라 → 사막</small>',30,-1), l60=lab('<b>60° 저압대</b><br><small>공기가 올라 비·눈</small>',60,-1), lS=lab('<small>남반구도 거울처럼 고리 3개</small>',-45,1);
+  var T1=7, T2=14, T3=22, T4=30;
+  COSX.caps=[[0,'태양은 적도를 가장 세게 데워. 데워진 공기는 가벼워져 위로 올라가(적도 수렴대, ITCZ) — 그래서 적도엔 구름과 비가 많아. 지구 가장자리에 그린 대기 단면은 두께를 100배 넘게 부풀렸어(실제 날씨가 생기는 대류권은 10~16 km).'],
+    [T1,'올라간 공기는 높은 하늘에서 극 쪽으로 가다 식어서 위도 30° 근처에서 내려와(해들리 순환). 내려오는 공기는 메말라서 사하라·아라비아 같은 큰 사막이 이 띠에 몰려 있어.'],
+    [T2,'그 너머로 페럴 순환(30~60°)과 극 순환(60~90°)이 맞물려 — 반구마다 고리 3개. 60° 근처에선 따뜻한 공기와 찬 공기가 부딪쳐 올라가며 비·눈이 잦아(한대 전선). 페럴 순환은 두 고리 사이에 끼어 반대로 도는 톱니바퀴 같아서, 실제로는 날씨 소용돌이들을 평균 냈을 때 보이는 흐름이야.'],
+    [T3,'고리 아래쪽 흐름이 곧 땅 위 바람이야: 무역풍(0~30°), 편서풍(30~60°), 극동풍(60~90°).'],
+    [T4,'바람이 남북으로 곧게 불지 않고 비스듬한 건 지구가 돌아서야 — 코리올리 효과: 북반구에선 움직이는 쪽의 오른쪽, 남반구에선 왼쪽으로 휘어(흰 화살표, 점선은 지구가 안 돈다면 갈 길). 그래서 무역풍은 북동(남반구는 남동)에서 불어. 한반도는 편서풍대라 날씨와 황사가 대체로 서쪽에서 와. 실제 대기는 계절마다 띠가 남북으로 오르내리고 계절풍·제트 기류가 섞여 훨씬 복잡해.']];
+  COSX.dur=40; COSX.view={yaw:0,pitch:0.12,dist:12.5,tgt:new THREE.Vector3(0,0,0),spin:0};
+  return {tick:function(t){ uT.value=t;
+    loops.forEach(function(L){ var op=L.ci===0?ss(2,4,t):ss(T2,T2+2,t); L.m.material.uniforms.uOp.value=op; L.m.visible=op>0.01; headsTick(L.hd,t,op,true); });
+    itcz.material.opacity=0.22+0.15*Math.sin(t*2); clouds.forEach(function(C){ var u=(C.ph+t*0.12)%1, r=R+0.1+u*H*0.9; C.s.position.set(C.sx*r,(C.ph-0.5)*0.5,0.05); C.s.material.opacity=0.6*Math.sin(Math.PI*u); });
+    var wo=ss(T3,T3+2,t); winds.forEach(function(W){ W.m.material.uniforms.uOp.value=wo; W.m.visible=W.c.visible=wo>0.01; W.c.material.opacity=wo; }); wl.forEach(function(L){ vis(L,wo>0.5); });
+    var co=ss(T4,T4+2,t); cor.forEach(function(C){ C.m.material.uniforms.uOp.value=co; C.m.visible=C.c.visible=C.g.visible=co>0.01; C.c.material.opacity=co; C.g.material.opacity=0.6*co; }); vis(lC,co>0.5);
+    vis(lH,t>T1); vis(lI,t>1); vis(l30,t>T1); vis(lFe,t>T2); vis(lP,t>T2); vis(l60,t>T2); vis(lS,t>T2); }};
+};
+
+/* ================= ③ 해류(겉 환류 + 깊은 바다 컨베이어 벨트) ================= */
+var CUR78=[ /* [이름(없으면 이름표 없음), 난류?, 점들(위도,경도)] */
+ ['멕시코 만류(걸프 스트림)',1,[[24,-81],[28,-79.5],[32,-78],[35,-74],[38,-68],[40,-60],[42,-50]]],['북대서양 해류',1,[[44,-42],[48,-30],[52,-22],[57,-14],[62,-5]]],['카나리아 해류(찬)',0,[[42,-16],[34,-14],[27,-17],[20,-20]]],
+ ['',1,[[15,-24],[14,-40],[15,-55],[18,-66],[22,-75]]],
+ ['브라질 해류',1,[[-10,-34],[-18,-38],[-26,-45],[-36,-52]]],['',0,[[-40,-48],[-41,-30],[-40,-10],[-37,8]]],['벵겔라 해류(찬)',0,[[-34,15],[-27,12],[-18,9],[-10,6]]],['',1,[[-4,4],[-4,-12],[-5,-25],[-8,-32]]],
+ ['쿠로시오 해류',1,[[18,124],[24,123],[29,128],[32,134],[35,140],[37,146]]],['',1,[[39,152],[41,165],[42,180],[43,-165],[44,-148]]],['캘리포니아 해류(찬)',0,[[46,-128],[38,-125],[30,-119],[23,-113]]],['',1,[[14,-118],[12,-140],[12,-165],[13,170],[14,148],[16,128]]],
+ ['동오스트레일리아 해류',1,[[-14,155],[-22,156],[-30,154],[-37,151]]],['훔볼트 해류(찬)',0,[[-42,-77],[-32,-74],[-20,-73],[-8,-82]]],['',1,[[-4,-88],[-7,-110],[-10,-135],[-12,-160],[-14,175],[-14,162]]],
+ ['아굴라스 해류',1,[[-18,41],[-26,35],[-33,28],[-37,22]]],['',0,[[-36,108],[-28,111],[-20,108],[-14,102]]],['',1,[[-12,98],[-13,80],[-14,62],[-15,48]]]
+];
+var ACC78=[]; for(var _l=-180;_l<180;_l+=20) ACC78.push([-57+3*Math.sin((_l+60)*D2R*2),_l]);
+var CONV78={deep:[[66,-26],[60,-40],[50,-48],[38,-60],[25,-62],[12,-48],[0,-32],[-20,-30],[-40,-28],[-55,-12],[-58,20],[-55,60],[-53,100],[-55,140],[-56,170],[-52,-168],[-35,-165],[-10,-170],[15,-172],[38,-172]],
+  indian:[[-55,60],[-42,75],[-25,80],[-8,78]], bottom:[[-72,-45],[-63,-40],[-50,-32]],
+  surf:[[38,-178],[25,172],[14,150],[5,130],[-3,122],[-9,116],[-12,100],[-15,80],[-22,58],[-32,32],[-37,20],[-28,5],[-14,-12],[2,-32],[14,-52],[24,-74],[33,-74],[41,-56],[50,-36],[60,-20],[66,-24]]};
+NEW.ocean=function(sc){ cxStars(sc,1200,300); cxLights(sc); var R=3.2, uT={value:0}, rS=R*1.008;
+  var EG=new THREE.Group(); sc.add(EG); EG.add(earth(R,96)); cxAtmo(sc,R);
+  var cs=[], labs=[];
+  function add(L,warm,name,closed){ var P=sphPts(L,rS,closed), cur=new THREE.CatmullRomCurve3(P,!!closed), col=warm?'#ff6a4a':'#5ab8ff', m=flow(cur,0.045,col,uT,{closed:closed,sp:0.35,dash:0.35}); EG.add(m);
+    var C={m:m,hd:heads(EG,cur,closed?8:2,col,0.16,0.35),cl:!!closed}; cs.push(C); if(name){ var o=new THREE.Object3D(); o.position.copy(P[Math.floor(P.length*0.5)]).multiplyScalar(1.02); EG.add(o); labs.push({L:cxLab('<b>'+name+'</b>',o,'pt'),o:o}); } return C; }
+  CUR78.forEach(function(c){ add(c[2],c[1],c[0]); }); add(ACC78,0,'남극 순환 해류',true);
+  [['북대서양 환류 ↻',30,-42],['북태평양 환류 ↻',28,-165],['남대서양 환류 ↺',-24,-15],['남태평양 환류 ↺',-28,-118],['인도양 환류 ↺',-26,78]].forEach(function(g){ var o=new THREE.Object3D(); o.position.copy(geo(g[1],g[2],R*1.02)); EG.add(o); labs.push({L:cxLab('<small>'+g[0]+'</small>',o,'pt'),o:o}); });
+  /* 컨베이어 벨트: 깊은 흐름(파랑)·겉 흐름(주황) — 깊은 흐름은 수천 m 밑이지만 보이게 겉 위에 겹쳐 그렸어 */
+  var cv=[]; function addC(L,col,r,w,v){ var P=sphPts(L,r), cur=new THREE.CatmullRomCurve3(P), m=flow(cur,w,col,uT,{sp:v,dash:0.5,op:0}); EG.add(m); cv.push({m:m,hd:heads(EG,cur,Math.max(2,Math.round(cur.getLength()/3)),col,0.22,v)}); }
+  addC(CONV78.deep,'#3f6dff',R*1.014,0.06,0.3); addC(CONV78.indian,'#3f6dff',R*1.014,0.06,0.3); addC(CONV78.bottom,'#7f9dff',R*1.014,0.05,0.3); addC(CONV78.surf,'#ffb347',R*1.02,0.06,0.45);
+  var mk=[]; function marker(lat,lon,down,txt){ var c=new THREE.Mesh(new THREE.ConeGeometry(0.16,0.42,14),new THREE.MeshBasicMaterial({color:down?'#9fc0ff':'#ffd27a',transparent:true,opacity:0})); var n=cxGeoDir(lat,lon); c.quaternion.setFromUnitVectors(UPV,down?n.clone().negate():n); EG.add(c);
+    var o=new THREE.Object3D(); o.position.copy(n.clone().multiplyScalar(R*1.2)); EG.add(o); var L=cxLab(txt,o,'pt'); mk.push({c:c,n:n,down:down,L:L,o:o}); }
+  marker(64,-30,1,'<b>그린란드 앞바다</b><br><small>차고 짠 물이 가라앉아 ↓</small>'); marker(-71,-45,1,'<b>웨델해(남극)</b><br><small>가장 무거운 바닥물 ↓</small>'); marker(40,-170,0,'<small>북태평양: 천천히 솟아올라 ↑</small>'); marker(-10,78,0,'<small>인도양: 천천히 솟아올라 ↑</small>');
+  var lD=new THREE.Object3D(); lD.position.copy(geo(-30,-29,R*1.04)); EG.add(lD); var lDp=cxLab('<b>깊은 흐름</b> <small>(수천 m 밑)</small>',lD,'pt'); var lU=new THREE.Object3D(); lU.position.copy(geo(-27,48,R*1.04)); EG.add(lU); var lUp=cxLab('<b>겉 흐름</b> <small>(따뜻한 물이 돌아와)</small>',lU,'pt gold');
+  var T1=8, T2=15, T3=21, T4=29;
+  COSX.caps=[[0,'바다 겉물은 바람(무역풍·편서풍)에 밀려 대양마다 커다랗게 돌아(환류). 북반구는 시계 방향, 남반구는 반시계 방향 — 지구 자전이 만드는 코리올리 효과 때문이야. 빨강은 따뜻한 해류, 파랑은 찬 해류. 굵기와 빠르기는 과장했어.'],
+    [T1,'대양 서쪽 가장자리엔 좁고 빠른 난류가 흘러: 대서양의 멕시코 만류, 태평양의 쿠로시오. 쿠로시오의 한 갈래(쓰시마 난류)는 동해로 들어와 우리 바다를 데워. 멕시코 만류가 실어 온 열 덕분에 서유럽은 같은 위도의 다른 곳보다 따뜻해.'],
+    [T2,'남극 둘레엔 막는 대륙이 없어서 바다가 지구를 한 바퀴 통째로 돌아(남극 순환 해류) — 물을 가장 많이 나르는 해류야.'],
+    [T3,'깊은 바다에도 아주 느린 흐름이 있어 — 열염 순환(\'컨베이어 벨트\'). 그린란드 앞바다와 남극 웨델해에서 차갑고 짠(그래서 무거운) 물이 수천 m 밑으로 가라앉아(아래 화살표) 바닥을 따라 퍼져 나가. 깊은 흐름은 보이게 겉 위에 겹쳐 그렸어.'],
+    [T4,'깊은 물(파랑)은 인도양·북태평양에서 천천히 솟아올라 겉물(주황)이 되어 다시 북대서양으로 돌아와. 한 바퀴에 대략 천 년(추정은 수백~천수백 년으로 갈려). 녹은 얼음물이 너무 많이 들어오면 바닷물이 덜 무거워져 이 순환이 약해질 수 있어 — 과학자들이 지켜보는 문제야.']];
+  COSX.dur=38; COSX.view={yaw:0.85,pitch:0.32,dist:11.5,tgt:new THREE.Vector3(0,0,0),spin:0.05};
+  var turned=false;
+  return {tick:function(t){ uT.value=t; var so=1-0.85*ss(T3,T3+2,t);
+    cs.forEach(function(C){ C.m.material.uniforms.uOp.value=so; headsTick(C.hd,t,so,C.cl); }); labs.forEach(function(L){ vis(L.L,so>0.5&&t>0.5&&front(L.o)); });
+    if(t>T3&&!turned){ turned=true; if(!COSX.view.user) COSX.view.yaw=0.7; }   /* 컨베이어가 시작하는 대서양 쪽으로 */
+    var co=ss(T3,T3+2,t), c2=ss(T4,T4+2,t); cv.forEach(function(C,i){ var o=i<3?co:c2; C.m.material.uniforms.uOp.value=o; C.m.visible=o>0.01; headsTick(C.hd,t,o,false); });
+    mk.forEach(function(M,i){ var o=i<2?co:c2, b=((t*0.6+i*0.3)%1); M.c.material.opacity=o; M.c.visible=o>0.01; M.c.position.copy(M.n).multiplyScalar(R*(M.down?1.16-0.1*b:1.06+0.1*b)); vis(M.L,o>0.5&&front(M.o)); }); vis(lDp,co>0.5&&front(lD)); vis(lUp,c2>0.5&&front(lU)); }};
+};
+
+/* ================= ④ 공전 궤도(타원·케플러 법칙) ================= */
+NEW.orbit=function(sc){ cxStars(sc,1500,300); sc.add(new THREE.AmbientLight(0xffffff,0.18)); var pl=new THREE.PointLight(0xffffff,1.5); sc.add(pl);
+  var a=6, e=0.35, eR=0.0167, b=a*Math.sqrt(1-e*e), Y=365.25, PER=12;   /* 보이는 이심률 0.35(실제 0.0167의 약 20배), 장면 12초 = 1년 */
+  var Sun=sunObj(sc,0.6,6); var lSun=cxLab('<b>태양</b> <small>(한 초점)</small>',Sun,'pt gold');
+  function kep(M,ee){ var E=M; for(var i=0;i<10;i++) E-=(E-ee*Math.sin(E)-M)/(1-ee*Math.cos(E)); return {nu:2*Math.atan2(Math.sqrt(1+ee)*Math.sin(E/2),Math.sqrt(1-ee)*Math.cos(E/2)),r:1-ee*Math.cos(E)}; }
+  function pos(nu,ee){ var r=a*(1-ee*ee)/(1+ee*Math.cos(nu)); return new THREE.Vector3(r*Math.cos(nu),0,-r*Math.sin(nu)); }
+  var op=[], og=[]; for(var i=0;i<256;i++){ var nu=i/256*Math.PI*2; op.push(pos(nu,e)); og.push(pos(nu,eR)); }
+  sc.add(lineLoop(op,'#9fc8ff',0.9)); var ghost=lineLoop(og,'#ffffff',0.55,0.18); sc.add(ghost);
+  var oG=new THREE.Object3D(); oG.position.copy(pos(Math.PI*0.62,eR)); sc.add(oG); var lG=cxLab('<small>실제 지구 궤도(이심률 0.017 — 거의 원)</small>',oG,'pt');
+  var F2=new THREE.Mesh(new THREE.RingGeometry(0.12,0.17,32),new THREE.MeshBasicMaterial({color:'#ffffff',side:THREE.DoubleSide,transparent:true,opacity:0.8})); F2.rotation.x=-Math.PI/2; F2.position.set(-2*a*e,0,0); sc.add(F2); var lF2=cxLab('<small>빈 초점</small>',F2,'pt');
+  var pP=pos(0,e), pA=pos(Math.PI,e), oP=new THREE.Object3D(), oA=new THREE.Object3D(); oP.position.copy(pP).add(new THREE.Vector3(0.35,0,1.1)); oA.position.copy(pA).add(new THREE.Vector3(-0.5,0,1.3)); sc.add(oP); sc.add(oA);
+  var lP=cxLab('<b>근일점</b> · 1월 3일 무렵<br><small>약 1억 4,710만 km</small>',oP,'pt'), lA=cxLab('<b>원일점</b> · 7월 4일 무렵<br><small>약 1억 5,210만 km</small>',oA,'pt');
+  [pP,pA].forEach(function(p){ var d=cxBall(0.07,'#ffffff',1); d.position.copy(p); sc.add(d); });
+  var E=earth(0.45,48); sc.add(E); E.add(cxSprite('#7fc8ff',1.6,0.35)); var lE=cxLab('<b>지구</b>',E,'pt');
+  var sl=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(1,0,0)]),new THREE.LineBasicMaterial({color:'#ffe9a8',transparent:true,opacity:0.7})); sc.add(sl);
+  /* 같은 시간(한 달) 동안 쓸고 간 넓이: 근일점 쪽·원일점 쪽 */
+  var DM=2*Math.PI*30.44/Y, fans=[];
+  [[0,'#ffd27a'],[Math.PI,'#7fd6ff']].forEach(function(F){ var v=[0,0.01,0], idx=[], n=32; for(var k=0;k<=n;k++){ var q=kep(F[0]-DM/2+DM*k/n,e), p=pos(q.nu,e); v.push(p.x,0.01,p.z); if(k) idx.push(0,k,k+1); }
+    var g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(v,3)); g.setIndex(idx); var m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:F[1],transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false})); sc.add(m);
+    var c=kep(F[0],e), o=new THREE.Object3D(); o.position.copy(pos(c.nu,e)).multiplyScalar(F[0]?0.62:0.55).add(new THREE.Vector3(0,0.05,F[0]?-0.9:-1.3)); sc.add(o); fans.push({m:m,L:cxLab('<b>30일 동안 쓴 넓이</b><br><small>두 부채꼴 넓이가 같아</small>',o,'pt')}); });
+  var info=pin(cxLab('',null,'cnt'));
+  var T1=7, T2=15, T3=23, T4=31;
+  COSX.caps=[[0,'지구는 태양 둘레를 타원으로 돌아. 태양은 타원 한가운데가 아니라 한쪽 초점에 있고, 반대편 초점은 텅 비어 있어(케플러 제1법칙).'],
+    [T1,'진짜 지구 궤도는 이심률 약 0.017 — 흰 점선처럼 거의 동그라미야. 여기선 차이가 보이게 약 20배(0.35) 찌그러뜨렸어. 가장 가까울 때(근일점, 1월 3일 무렵) 약 1억 4,710만 km, 가장 멀 때(원일점, 7월 4일 무렵) 약 1억 5,210만 km — 북반구는 오히려 태양에 가장 가까울 때가 겨울이야.'],
+    [T2,'태양과 지구를 잇는 선은 같은 시간 동안 같은 넓이를 쓸고 지나가(케플러 제2법칙). 두 부채꼴은 둘 다 30일 동안 쓴 넓이야 — 넓이는 같은데 가까운 쪽은 짧고 넓적하고, 먼 쪽은 길고 홀쭉해.'],
+    [T3,'그래서 지구는 태양에 가까울수록 빨라: 근일점에서 초속 약 30.3 km, 원일점에서 약 29.3 km. 이 때문에 북반구의 겨울 반년(추분→춘분, 약 179일)이 여름 반년(춘분→추분, 약 186일)보다 일주일쯤 짧아.'],
+    [T4,'궤도가 찌그러진 정도(이심률)도 약 10만 년(그리고 약 40만 년) 리듬으로 0.003~0.058쯤 사이를 천천히 오가 — 빙하기 리듬과 이어져(\'세차 운동\' 탭).']];
+  COSX.dur=40; COSX.view={yaw:0,pitch:1.0,dist:17.5,tgt:new THREE.Vector3(-a*e-1.6,0,1.0),spin:0};
+  return {tick:function(t){ var M=2*Math.PI*t/PER, q=kep(M,e), p=pos(q.nu,e); E.position.copy(p); E.rotation.y=t*3; sl.geometry.attributes.position.setXYZ(1,p.x,p.y,p.z); sl.geometry.attributes.position.needsUpdate=true;
+    var qr=kep(M,eR), v=29.78*Math.sqrt((1+2*eR*Math.cos(qr.nu)+eR*eR)/(1-eR*eR)), rr=149.6*(1-eR*eR)/(1+eR*Math.cos(qr.nu)), man=Math.round(rr*10)*10;
+    setLab(info,md(2+M/(2*Math.PI)*Y)+' · 태양까지 약 '+Math.floor(man/10000)+'억 '+(man%10000).toLocaleString()+'만 km · 공전 속도 약 <b>'+v.toFixed(1)+' km/s</b> <small>(실제 값)</small>'); info.el.style.opacity=t>T1?1:0;
+    ghost.visible=t>T1-0.5; vis(lG,t>T1); vis(lP,t>T1); vis(lA,t>T1); var fo=ss(T2,T2+1.5,t); fans.forEach(function(F){ F.m.material.opacity=0.38*fo; F.m.visible=fo>0.01; vis(F.L,fo>0.5); }); }};
+};
+
+/* ================= ⑤ 자전축 기울기와 계절 ================= */
+NEW.tilt=function(sc){ cxStars(sc,1500,300); sc.add(new THREE.AmbientLight(0xffffff,0.3)); sc.add(new THREE.PointLight(0xffffff,1.5));
+  var RO=7, Re=0.95, EPS=23.44*D2R, n=new THREE.Vector3(Math.sin(EPS),Math.cos(EPS),0);   /* 축은 늘 같은 방향(+x 쪽으로 23.4°) */
+  var Sun=sunObj(sc,1.1,5); cxLab('<b>태양</b>',Sun,'pt gold'); sc.add(lineLoop(circ(RO,180),'#9fc8ff',0.5));
+  function mkEarth(r,op){ var tg=new THREE.Group(); tg.rotation.z=-EPS; var sp=earth(r,48); if(op<1){ sp.material.transparent=true; sp.material.opacity=op; } tg.add(sp);
+    var ax=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-r*1.7,0),new THREE.Vector3(0,r*1.9,0)]),new THREE.LineBasicMaterial({color:'#ffffff',transparent:true,opacity:op<1?0.6:1})); tg.add(ax);
+    var tip=new THREE.Mesh(new THREE.ConeGeometry(r*0.09,r*0.3,10),new THREE.MeshBasicMaterial({color:'#ffffff'})); tip.position.y=r*1.9; tg.add(tip); var g=new THREE.Group(); g.add(tg); return {g:g,tg:tg,sp:sp}; }
+  var SEAS=[[Math.PI/2,'3월 춘분','3월 20일 무렵'],[Math.PI,'6월 하지','6월 21일 무렵'],[Math.PI*1.5,'9월 추분','9월 23일 무렵'],[0,'12월 동지','12월 22일 무렵']], gl=[];
+  SEAS.forEach(function(S){ var G=mkEarth(0.4,0.75), p=new THREE.Vector3(Math.cos(S[0])*RO,0,-Math.sin(S[0])*RO); G.g.position.copy(p); sc.add(G.g); var o=new THREE.Object3D(); o.position.copy(p).multiplyScalar(1.22); o.position.y=-0.6; sc.add(o); gl.push(cxLab('<b>'+S[1]+'</b><br><small>'+S[2]+'</small>',o,'pt')); });
+  var ME=mkEarth(Re,1); sc.add(ME.g);
+  [[0,'#ffffff',0.6],[23.44,'#ffd27a',0.8],[-23.44,'#ffd27a',0.8],[66.56,'#9fd8ff',0.45],[-66.56,'#9fd8ff',0.45]].forEach(function(c){ var r=Re*1.012*Math.cos(c[0]*D2R); ME.tg.add(lineLoop(circ(r,96,Re*1.012*Math.sin(c[0]*D2R)),c[1],c[2])); });
+  var oN=new THREE.Object3D(); oN.position.y=Re*2.15; ME.tg.add(oN); var lN=cxLab('<small>북극성 쪽 ↑ (1년 내내 같은 쪽)</small>',oN,'pt');
+  var vl=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-Re*1.6,0),new THREE.Vector3(0,Re*1.9,0)]),new THREE.LineDashedMaterial({color:'#aab6c8',dashSize:0.08,gapSize:0.07})); vl.computeLineDistances(); ME.g.add(vl);
+  var oE=new THREE.Object3D(); oE.position.set(Re*0.42,Re*1.75,0); ME.g.add(oE); var lEp=cxLab('<small>23.4°</small>',oE,'pt');
+  var ss0=cxSprite('#fff6c0',0.5,1); sc.add(ss0); var lSs=cxLab('',ss0,'pt gold');
+  var info=pin(cxLab('',null,'cnt'));
+  /* 지구 자리(각도): 춘분 → 하지(멈춤) → 추분 → 동지(멈춤) → 계속 공전 */
+  var KF=[[0,Math.PI/2],[6,Math.PI],[13,Math.PI],[17,Math.PI*1.5],[19,Math.PI*1.5],[23,Math.PI*2],[27,Math.PI*2]];
+  function ang(t){ if(t>=27) return Math.PI*2+(t-27)*0.4; for(var i=0;i<KF.length-1;i++){ var A=KF[i], B=KF[i+1]; if(t<B[0]) return A[1]+(B[1]-A[1])*ss(A[0],B[0],t); } return Math.PI*2; }
+  COSX.caps=[[0,'지구 자전축은 공전면에 수직인 선(점선)에서 약 23.4° 기울어 있어. 그리고 1년 내내 같은 쪽(북극성 근처)을 가리켜 — 공전해도 축 방향이 바뀌지 않아(네 자리의 작은 지구를 봐).'],
+    [6,'6월 하지(21일 무렵): 북반구가 태양 쪽으로 기울어 해가 높이 뜨고 낮이 길어 → 북반구 여름. 해가 머리 꼭대기에 오는 곳이 북위 23.4°(북회귀선, 노란 선)까지 올라가. 같은 때 남반구는 겨울이야.'],
+    [13,'3월 춘분·9월 추분: 축이 태양 쪽으로도 반대쪽으로도 기울지 않아서 해가 적도 바로 위에 와 — 온 세상 낮과 밤이 거의 같아. 12월 동지엔 거꾸로 북반구가 태양 반대쪽으로 기울어 겨울이 돼.'],
+    [23,'해가 높으면 같은 햇빛이 좁은 땅에 몰려 더 뜨겁고 낮도 길어 — 이게 계절의 진짜 까닭이야. 서울(북위 37.6°)의 한낮 해 높이는 하지 약 76°, 동지 약 29°.'],
+    [30,'거리 때문이 아니야: 지구는 1월 초에 태양과 가장 가까운데 그때 북반구는 한겨울이고, 같은 날 남반구는 한여름이야. 1년 동안 거리 차이는 약 3%(햇빛 세기로 약 7%)뿐이야. 지구 크기와 기울기 선들은 보이게 크게 그렸어.']];
+  COSX.dur=40; COSX.view={yaw:-0.5,pitch:0.42,dist:18,tgt:new THREE.Vector3(-2.6,-0.3,0.2),spin:0};
+  var toS=new THREE.Vector3();
+  return {tick:function(t){ var th=ang(t), p=new THREE.Vector3(Math.cos(th)*RO,0,-Math.sin(th)*RO); ME.g.position.copy(p); ME.sp.rotation.y=t*1.4;
+    toS.copy(p).negate().normalize(); var lat=Math.asin(clamp(toS.dot(n),-1,1))/D2R; ss0.position.copy(p).addScaledVector(toS,Re*1.05);
+    var la=Math.abs(lat)<0.3?'0°(적도)':Math.abs(lat).toFixed(1)+'°'+(lat>0?'N':'S')+(Math.abs(lat)>23.2?(lat>0?'(북회귀선)':'(남회귀선)'):'');
+    setLab(lSs,'<small>해가 머리 위: '+la+'</small>'); var doy=78+(th-Math.PI/2)/(2*Math.PI)*365.25;
+    var seoul=90-37.57+lat; setLab(info,md(doy)+' 무렵 · 북반구 '+(lat>8?'여름 쪽':lat<-8?'겨울 쪽':'봄·가을 쪽')+' · 서울 한낮 해 높이 약 <b>'+Math.round(seoul)+'°</b>'); info.el.style.opacity=t>2?1:0; vis(lEp,t<13); vis(lN,true); }};
+};
+
+/* ================= ⑥ 세차 운동과 밀란코비치 주기 ================= */
+NEW.precess=function(sc){ cxStars(sc,2200,300); cxLights(sc); var R=2.2, EPS0=23.44, Lx=7.5, PRE=25772;
+  var A=new THREE.Group(), T=new THREE.Group(); sc.add(A); A.add(T); var E=earth(R,64); E.scale.set(1,0.92,1); T.add(E);   /* 적도 부풂은 보이게 과장(실제 납작한 정도 약 1/298) */
+  var bul=new THREE.Mesh(new THREE.TorusGeometry(R*1.0,0.05,8,120),new THREE.MeshBasicMaterial({color:'#ffd27a',transparent:true,opacity:0.8})); bul.rotation.x=Math.PI/2; T.add(bul);
+  var oB=new THREE.Object3D(); oB.position.set(R*1.05,0,0); T.add(oB); var lB=cxLab('<small>적도 부풂(과장)</small>',oB,'pt');
+  T.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-R*1.7,0),new THREE.Vector3(0,Lx,0)]),new THREE.LineBasicMaterial({color:'#ffffff'})));
+  var tip=cxSprite('#ffffff',0.8,1); tip.position.y=Lx; T.add(tip);
+  function skyPt(ph,eps){ return new THREE.Vector3(Lx*Math.sin(eps)*Math.cos(ph),Lx*Math.cos(eps),-Lx*Math.sin(eps)*Math.sin(ph)); }
+  var ring=[]; for(var i=0;i<128;i++) ring.push(skyPt(i/128*Math.PI*2,EPS0*D2R)); sc.add(lineLoop(ring,'#9fc8ff',0.6,0.15));
+  var cone=new THREE.ConeGeometry(Lx*Math.sin(EPS0*D2R),Lx*Math.cos(EPS0*D2R),96,1,true); cone.rotateX(Math.PI); cone.translate(0,Lx*Math.cos(EPS0*D2R)/2,0);
+  sc.add(new THREE.Mesh(cone,new THREE.MeshBasicMaterial({color:'#7fc8ff',transparent:true,opacity:0.07,side:THREE.DoubleSide,depthWrite:false})));
+  sc.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,Lx*1.08,0)]),new THREE.LineDashedMaterial({color:'#aab6c8',dashSize:0.15,gapSize:0.12})).computeLineDistances());
+  var oP=new THREE.Object3D(); oP.position.set(0,Lx*1.1,0); sc.add(oP); var lPo=cxLab('<small>공전면에 수직(황도 북극)</small>',oP,'pt');
+  var ST=[['폴라리스 — 지금의 북극성',0,'#fff6c0'],['베가 — 약 1만 2천~1만 3천 년 뒤',-Math.PI,'#cfe0ff'],['투반 — 약 4,800년 전',2*Math.PI*4800/PRE,'#ffe0c0']], sl=[];
+  ST.forEach(function(s){ var sp=cxSprite(s[2],0.9,1); sp.position.copy(skyPt(s[1],EPS0*D2R)); sc.add(sp); sl.push(cxLab('★ '+s[0],sp,'pt')); });
+  var info=pin(cxLab('',null,'cnt'));
+  var ch=pin(cxLab('',null,'cnt'),1);
+  (function(){ var W=330, Hh=150, rows=[['세차(기후 주기 약 2만 3천 년)','#ffd27a',function(k){ return Math.sin(2*Math.PI*k/23)*(0.6+0.4*Math.cos(2*Math.PI*k/100)); }],['축 기울기 22.1°~24.5° (약 4만 1천 년)','#7fd6ff',function(k){ return Math.sin(2*Math.PI*k/41); }],['이심률 (약 10만 년 · 40만 년)','#9fffb0',function(k){ return 0.7*Math.cos(2*Math.PI*k/100)+0.3*Math.cos(2*Math.PI*k/405); }]];
+    var s='<div style="font-size:12.5px;margin-bottom:3px" class="v78ob"></div><div style="font-size:12px;margin-bottom:2px"><b>밀란코비치 주기</b> <small style="opacity:.75">— 개념 그림(실제 곡선 아님), 지난 40만 년</small></div><svg width="'+W+'" height="'+Hh+'" viewBox="0 0 '+W+' '+Hh+'">';
+    rows.forEach(function(r,i){ var y0=24+i*46, d=''; for(var x=0;x<=W;x+=3){ var k=400-x/W*400; d+=(x?'L':'M')+x+' '+(y0-r[2](k)*13).toFixed(1); } s+='<path d="'+d+'" fill="none" stroke="'+r[1]+'" stroke-width="1.6"/><text x="2" y="'+(y0-16)+'" fill="'+r[1]+'" font-size="10.5">'+r[0]+'</text>'; });
+    s+='<text x="2" y="'+(Hh-1)+'" fill="#aab" font-size="10">40만 년 전</text><text x="'+(W-24)+'" y="'+(Hh-1)+'" fill="#aab" font-size="10">지금</text></svg>'; ch.el.innerHTML=s; })();
+  var T1=8, T2=16, T3=23, T4=31;
+  COSX.caps=[[0,'지구는 팽이처럼 돌면서 자전축 자체도 천천히 원뿔을 그리며 돌아 — 세차 운동이야. 지구는 적도가 살짝 불룩한데(여기선 과장), 달과 태양이 그 부풂을 당겨 축을 세우려 하니까 팽이처럼 축이 비틀거리며 돌아.'],
+    [T1,'한 바퀴에 약 2만 6천 년(약 25,800년). 그래서 \'북극성\'도 바뀌어: 지금은 폴라리스지만, 약 1만 2천~1만 3천 년 뒤엔 거문고자리 베가가 북극 하늘 가까이 와. 약 4,800년 전 피라미드 시대엔 용자리 투반이 북극성이었어. 아래 숫자는 장면을 아주 빨리 돌린 햇수야.'],
+    [T2,'세차 때문에 춘분점도 해마다 조금씩(약 50초각) 밀려 — 그래서 별을 기준으로 잰 1년(항성년)과 계절이 돌아오는 1년(회귀년)이 약 20분 달라.'],
+    [T3,'밀란코비치 주기: 지구 궤도와 축은 세 가지 리듬으로 흔들려. ① 세차 — 궤도의 변화와 합쳐 기후에 주는 리듬은 약 1만 9천~2만 3천 년 ② 축 기울기 22.1°~24.5°, 약 4만 1천 년(지금 약 23.4°, 줄어드는 중) ③ 궤도 이심률, 약 10만 년과 40만 년. 지금 장면에선 축 기울기가 오르내리는 걸 빨리 보여 줘.'],
+    [T4,'이 리듬들이 북반구 여름 햇빛의 양을 바꿔서 빙하기와 간빙기가 번갈아 와 — 지난 약 80만 년 동안은 약 10만 년마다 빙하기가 되풀이됐고, 마지막 빙하 최대기는 약 2만 년 전이야. 1976년 깊은 바다 퇴적물 연구로 확인됐어. 다만 햇빛 변화 자체는 작아서 이산화탄소·얼음의 되먹임이 키운 것으로 보고, 왜 10만 년 리듬이 가장 센지는 아직 논쟁 중이야(모름).']];
+  COSX.dur=42; COSX.view={yaw:0.35,pitch:0.5,dist:21,tgt:new THREE.Vector3(-1.69,2.8,0.62),spin:0};
+  return {tick:function(t){ var yrs=Math.max(0,t-2)*1500, ph=-2*Math.PI*yrs/PRE, eps=t<T3?EPS0:23.3+1.2*Math.sin((t-T3)*0.9);
+    A.rotation.y=ph; T.rotation.z=-eps*D2R; E.rotation.y=t*5;
+    var y=Math.round(yrs%PRE/100)*100, near=Math.abs(((yrs%PRE)/PRE+1)%1-0.5)<0.03?' — 베가 근처!':((yrs%PRE)<600&&yrs>1000)?' — 다시 폴라리스':Math.abs((yrs%PRE)-(PRE-4800))<700?' — 투반 근처':'';
+    setLab(info,'축이 가리키는 곳: 지금부터 <b>+'+y.toLocaleString()+'년</b>'+near); info.el.style.opacity=t<T3?1:0;
+    if(t>T3){ var ob=ch.el.querySelector('.v78ob'), oh='지금 장면의 축 기울기 <b>'+eps.toFixed(1)+'°</b> <small>(빨리 감기)</small>'; if(ob&&ob.innerHTML!==oh) ob.innerHTML=oh; } ch.el.style.opacity=t>T3?1:0; vis(lB,t<T1); vis(lPo,t>1); }};
+};
+
+/* ================= ⑦ 골딜락스 존(생명 가능 지대) ================= */
+NEW.golds=function(sc){ cxStars(sc,1500,300); sc.add(new THREE.AmbientLight(0xffffff,0.2)); sc.add(new THREE.PointLight(0xffffff,1.5)); var AU=4;
+  var Sun=sunObj(sc,0.45,8); var lSun=cxLab('<b>태양</b>',Sun,'pt gold');
+  var ZU={uIn:{value:0.95*AU},uOut:{value:1.4*AU}};
+  var zone=new THREE.Mesh(new THREE.RingGeometry(0.5,9.5,160,8),new THREE.ShaderMaterial({uniforms:ZU,transparent:true,depthWrite:false,side:THREE.DoubleSide,
+    vertexShader:'varying vec2 vP; void main(){ vP=position.xy; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+    fragmentShader:'uniform float uIn,uOut; varying vec2 vP; void main(){ float r=length(vP); float w=0.12; float inZ=smoothstep(uIn-w,uIn+w,r)*(1.0-smoothstep(uOut-w,uOut+w,r)); float hot=1.0-smoothstep(uIn-w,uIn+w,r); float cold=smoothstep(uOut-w,uOut+w,r)*(1.0-smoothstep(7.0,9.5,r));'+
+      ' vec3 c=vec3(1.0,0.45,0.2)*hot*0.16+vec3(0.3,1.0,0.5)*inZ*0.42+vec3(0.35,0.6,1.0)*cold*0.12; float a=hot*0.16+inZ*0.42+cold*0.12; float edge=exp(-pow((r-uIn)/0.04,2.0))+exp(-pow((r-uOut)/0.04,2.0)); c+=vec3(0.6,1.0,0.7)*edge*0.5; a+=edge*0.4; gl_FragColor=vec4(c/max(a,0.001),a); }'}));
+  zone.rotation.x=-Math.PI/2; zone.position.y=-0.02; sc.add(zone);
+  var PL=[['수성',0.387,88,0.1,'#a9a39a',null],['금성',0.723,224.7,0.17,'#e8c27a','tex/planets/venus.jpg'],['지구',1.0,365.25,0.18,null,'E'],['화성',1.524,687,0.13,'#c1653a','tex/planets/mars.jpg']], pls=[];
+  PL.forEach(function(p,i){ sc.add(lineLoop(circ(p[1]*AU,160),'#9fb2c8',0.35)); var m=p[5]==='E'?earth(p[3],32):new THREE.Mesh(new THREE.SphereGeometry(p[3],32,24),new THREE.MeshStandardMaterial(p[5]?{map:tex('v78_'+p[0],p[5]),roughness:0.9}:{color:p[4],roughness:0.9})); sc.add(m);
+    var L=cxLab('<b>'+p[0]+'</b> <small>'+p[1]+' AU</small>',m,'pt'); pls.push({m:m,p:p,L:L,ph:i*1.7}); });
+  var lV=pls[1].L, lM=pls[3].L, lEa=pls[2].L;
+  var oI=new THREE.Object3D(), oO=new THREE.Object3D(), oZ=new THREE.Object3D(); sc.add(oI); sc.add(oO); sc.add(oZ);
+  var lIn=cxLab('',oI,'pt'), lOut=cxLab('',oO,'pt'), lZ=cxLab('<b style="color:#9fffb0">골딜락스 존</b><br><small>겉에 물이 액체로 있을 수 있는 거리</small>',oZ,'pt');
+  var lHot=cxLab('<small style="color:#ffb08a">너무 뜨거워 — 물이 끓어 날아가</small>',new THREE.Vector3(-0.55*AU*0.7,0,0.55*AU*0.7),'pt'), lCold=cxLab('<small style="color:#9fc8ff">너무 추워 — 물이 얼어</small>',new THREE.Vector3(-1.8*AU*0.71,0,1.8*AU*0.71),'pt');
+  var info=pin(cxLab('',null,'cnt'));
+  /* 태양 나이(10억 년) 열쇠 장면: 지금 → 갓 태어난 때로 되감기 → 지금 → (역설) 젊은 태양 → 미래 */
+  var NOW=4.57, KF=[[0,NOW],[16,NOW],[17.5,0],[23,NOW],[24,NOW],[25.5,0.3],[31,0.3],[33,NOW],[38,5.57]];
+  function age(t){ for(var i=0;i<KF.length-1;i++){ var A=KF[i], B=KF[i+1]; if(t<B[0]) return A[1]+(B[1]-A[1])*ss(A[0],B[0],t); } return KF[KF.length-1][1]; }
+  function lum(g){ return 1/(1+0.4*(1-g/NOW)); }   /* 태양 밝기의 대략식(Gough 1981): 처음 약 70% → 지금 100% → 10억 년 뒤 약 110% */
+  COSX.caps=[[0,'골딜락스 존은 별에서 너무 가깝지도 멀지도 않아 행성 겉에 물이 액체로 있을 수 있는 거리야(동화 속 \'딱 알맞은 죽\'에서 딴 이름). 태양은 흔히 약 0.95~1.4 AU로 잡아(1 AU = 지구–태양 거리, 약 1억 5천만 km). 다만 계산 방법에 따라 넓게는 0.75~1.8 AU까지 달라져.'],
+    [8,'금성(0.72 AU)은 안쪽이라 온실 효과가 폭주해 겉이 약 460 °C야. 화성(1.52 AU)은 바깥 경계 언저리 — 옛날 물이 흐른 흔적은 있지만, 작아서 대기를 많이 잃고 지금은 춥고 메말랐어. 지구는 딱 알맞은 자리야.'],
+    [16,'태양은 나이 들수록 조금씩 밝아져(1억 년에 약 1%). 46억 년 전 갓 태어난 태양은 지금의 약 70%였어. 밝아질수록 골딜락스 존은 바깥으로 밀려나(띠의 거리는 밝기의 제곱근에 비례).'],
+    [24,'그런데 어두운 젊은 태양 아래서도 지구엔 바다가 있었어 — \'어두운 젊은 태양 역설\'. 이산화탄소·메탄 같은 온실 기체가 더 많았을 거라고 보지만, 정확한 답은 아직 연구 중이야(모름).'],
+    [31,'앞으로 약 10억 년 뒤엔 태양이 지금보다 10%쯤 밝아져 지구가 안쪽 경계에 걸려 — 바다가 증발하기 시작할 거라는 추정이야(시기는 연구마다 크게 달라). 다만 존 밖이라도 유로파·엔셀라두스처럼 얼음 밑에 바다가 있는 곳도 있어서, 생명이 꼭 이 띠 안에만 있다는 뜻은 아니야. 행성 크기는 보이게 크게 그렸어.']];
+  COSX.dur=42; COSX.view={yaw:0.3,pitch:1.0,dist:15.5,tgt:new THREE.Vector3(-1.43,0,1.04),spin:0};
+  return {tick:function(t){ var g=age(t), L=lum(g), q=Math.sqrt(L), ri=0.95*q, ro=1.4*q; ZU.uIn.value=ri*AU; ZU.uOut.value=ro*AU;
+    Sun.scale.setScalar(Math.pow(L,0.6)); Sun.material.color.setHSL(0.11-0.02*(1-L),1,0.62+0.1*(L-1));
+    pls.forEach(function(P){ var a=P.ph+t*2*Math.PI/(P.p[2]/365.25*9); P.m.position.set(Math.cos(a)*P.p[1]*AU,0,-Math.sin(a)*P.p[1]*AU); P.m.rotation.y=t*0.8; });
+    var bA=-2.2; oI.position.set(Math.cos(bA)*ri*AU,0,-Math.sin(bA)*ri*AU); oO.position.set(Math.cos(bA)*ro*AU,0,-Math.sin(bA)*ro*AU); oZ.position.set(Math.cos(2.4)*(ri+ro)/2*AU,0,-Math.sin(2.4)*(ri+ro)/2*AU);
+    setLab(lIn,'<small>안쪽 경계 약 '+ri.toFixed(2)+' AU</small>'); setLab(lOut,'<small>바깥 경계 약 '+ro.toFixed(2)+' AU</small>');
+    setLab(lV,'<b>금성</b> <small>0.72 AU'+(t>8?' — 너무 뜨거워(약 460 °C)':'')+'</small>'); setLab(lM,'<b>화성</b> <small>1.52 AU'+(t>8?' — 춥고 대기가 얇아':'')+'</small>');
+    var ein=1>=ri&&1<=ro; setLab(lEa,'<b>지구</b> <small>1 AU'+(t>16?(ein?(1-ri<0.05?' — 안쪽 경계에 걸려!':' — 존 안'):(1<ri?' — 존 안쪽 밖(너무 뜨거워)':' — 존 바깥(너무 추워)')):'')+'</small>');
+    var d=g-NOW, when=Math.abs(d)<0.05?'지금(태양 나이 약 46억 년)':d<0?'약 '+Math.round(-d*10)+'억 년 전':'약 '+Math.round(d*10)+'억 년 뒤';
+    setLab(info,when+' · 태양 밝기 지금의 <b>'+Math.round(L*100)+'%</b> · 골딜락스 존 '+ri.toFixed(2)+'~'+ro.toFixed(2)+' AU'); info.el.style.opacity=t>1?1:0; }};
+};
+
+/* ---------- 줄(탭) 덧붙이기 + 장면 고르기 감싸기 ---------- */
+[['tide','조석(밀물·썰물)'],['atmo','대기 대류'],['ocean','해류'],['orbit','공전 궤도'],['tilt','자전축 기울기와 계절'],['precess','세차 운동'],['golds','골딜락스 존']].forEach(function(tb){ if(!POP.inside.tabs.some(function(x){ return x[0]===tb[0]; })) POP.inside.tabs.push(tb); });
+var _b=POP.inside.b; POP.inside.b=function(sc,tab){ if(NEW[tab]) return NEW[tab](sc); return _b.call(this,sc,tab); };
+POP.earthin=POP.inside;
 })();
 
 /* ================= 얕은 물 파동 물리(충돌 장면) =================
@@ -9213,4 +9669,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=69752bf5ad"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=372f4b51f9"); });</script></body></html>
