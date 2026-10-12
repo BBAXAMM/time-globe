@@ -8875,7 +8875,7 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
       '#intro{position:fixed;inset:0;z-index:200;background:#000;overflow:hidden;cursor:pointer;transition:opacity .9s ease}',
       '#intro .sc{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity .7s ease;will-change:transform,opacity}',
       '#intro .sc.on{opacity:1}',
-      '#intro .cap{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 54px);text-align:center;color:#fff;font:600 clamp(16px,2.6vw,26px) "Gowun Batang",Georgia,serif;text-shadow:0 2px 14px rgba(0,0,0,.7);opacity:0;transition:opacity .5s ease;pointer-events:none;padding:0 16px}',
+      '#intro .cap{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 54px);text-align:center;color:#fff;font:600 clamp(16px,2.6vw,26px) "Gowun Batang",Georgia,serif;text-shadow:0 2px 14px rgba(0,0,0,.7);opacity:0;transition:opacity .25s ease;pointer-events:none;padding:0 16px}',
       '#intro .cap.on{opacity:.95}',
       '#intro .skip{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);border:0;border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}',
       '#intro .bar{position:absolute;left:0;bottom:0;height:2px;background:rgba(255,255,255,.55);width:0}',
@@ -8887,7 +8887,7 @@ function eraRegionAt(lat,lon){ lon=((lon+540)%360)-180;
     function show(k){ if(done) return; if(k>=S2.length){ finish(); return; } var s=S2[k], d=els[k], kb=s.kb||[1.1,1,'50% 50%'];
       d.style.transformOrigin=kb[2]||'50% 50%'; d.style.transition='none'; d.style.transform='scale('+kb[0]+')'; void d.offsetWidth;
       var fd=s.fade||Math.min(0.5,(s.dur||2.6)*0.55); d.style.transition='opacity '+fd+'s ease, transform '+((s.dur||2.6)+fd+0.2)+'s linear'; d.style.transform='scale('+kb[1]+')'; d.classList.add('on'); if(k>0){ var pv=els[k-1]; setTimeout(function(){ pv.classList.remove('on'); },fd*1000+30); }
-      cap.classList.remove('on'); setTimeout(function(){ cap.textContent=en?(s.en||s.t||''):(s.t||''); cap.classList.toggle('on',!!(s.t||s.en)); },Math.min(260,fd*600));
+      var tx=en?(s.en||s.t||''):(s.t||''); cap.textContent=tx; cap.classList.toggle('on',!!tx);
       i=k; timer=setTimeout(function(){ show(k+1); },(s.dur||2.6)*1000); }
     (function prog(){ if(done) return; bar.style.width=Math.min(100,(performance.now()-t0)/(total*10))+'%'; requestAnimationFrame(prog); })();
     function finish(){ if(done) return; done=true; clearTimeout(timer); try{ localStorage.setItem('tg_intro','1'); }catch(e){}
@@ -9213,4 +9213,4 @@ Promise.all(['index','places','land','geo','sky','geolabels','rivers'].map(funct
 
 
 </script>
-<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=62ec2f0e04"); });</script></body></html>
+<script>if("serviceWorker" in navigator) addEventListener("load",function(){ navigator.serviceWorker.register("sw.js?v=69752bf5ad"); });</script></body></html>
