@@ -48,7 +48,9 @@
     1.0,
     1.1,
     "50% 50%"
-   ]
+   ],
+   "vid": "intro/04.mp4",
+   "vs": 0
   },
   {
    "img": "intro/05.webp",
@@ -59,7 +61,9 @@
     1.12,
     1.0,
     "50% 50%"
-   ]
+   ],
+   "vid": "intro/05.mp4",
+   "vs": 0
   },
   {
    "img": "intro/06.webp",
@@ -405,41 +409,12 @@
    "vs": 0
   },
   {
-   "dur": 1.0,
-   "kb": [
-    1.1,
-    1.0,
-    "50% 50%"
-   ],
-   "img": "intro/41.webp",
-   "t": "우리 집",
-   "en": "Our home",
-   "vid": "intro/41.mp4",
-   "vs": 0
-  },
-  {
-   "dur": 1.0,
-   "kb": [
-    1.1,
-    1.0,
-    "50% 50%"
-   ],
-   "img": "intro/42.webp",
-   "t": "우리 동네",
-   "en": "Our neighborhood"
-  },
-  {
-   "dur": 1.0,
-   "kb": [
-    1.1,
-    1.0,
-    "50% 50%"
-   ],
-   "img": "intro/43.webp",
-   "t": "우리 나라",
-   "en": "Our country",
-   "vid": "intro/43.mp4",
-   "vs": 0
+   "img": "intro/50.webp",
+   "vid": "intro/50.mp4",
+   "vs": 0,
+   "t": "우리 집에서 우리 나라로",
+   "en": "From our home to our country",
+   "dur": 1.0
   }
  ]
 }
